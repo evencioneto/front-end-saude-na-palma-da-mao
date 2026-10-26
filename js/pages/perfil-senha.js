@@ -1,8 +1,7 @@
-// Alterar senha do paciente. Enquanto o back-end não tem login real (ver authService), a senha atual é conferida
-// no cadastro e a nova é gravada com PUT /usuarios/:id, do mesmo jeito que o cadastro grava.
+// Alterar senha do paciente. A tela valida os campos, mas o servidor ainda não tem uma rota para o paciente trocar a
+// própria senha: quando existir, o envio entra no fim do submit (hoje só avisa).
 import { exigirLogin, PERFIS } from "../core/guard.js";
-import { usuarioApi } from "../services/usuarioService.js";
-import { h, $, toast, comBotaoOcupado } from "../core/dom.js";
+import { h, $, toast } from "../core/dom.js";
 import { barraPac } from "../ui/fluxoPaciente.js";
 import { campo, mostrarErro } from "../ui/campoPaciente.js";
 import { registrarPwa } from "../pwa.js";
@@ -36,24 +35,9 @@ function iniciar(s) {
       form.querySelector("[aria-invalid=true]")?.focus();
       return;
     }
-    try {
-      await comBotaoOcupado(salvar, "Salvando...", async () => {
-        const u = await usuarioApi.buscar(s.idUsuario);
-        if (!u || u.senha_hash !== atual.input.value) {
-          mostrarErro(atual, "A senha atual está incorreta.");
-          atual.input.focus();
-          return false;
-        }
-        await usuarioApi.atualizar(s.idUsuario, { senha_hash: nova.input.value });
-        return true;
-      }).then((feito) => {
-        if (!feito) return;
-        toast("Senha alterada com sucesso.", "sucesso");
-        setTimeout(() => location.assign("perfil.html"), 600);
-      });
-    } catch (err) {
-      toast(err.message, "erro");
-    }
+    // O servidor ainda não tem rota para o paciente trocar a própria senha (PUT /usuarios é só do administrador e
+    // não faz o hash). Gravar do jeito antigo trancaria a conta, então nada é enviado.
+    toast("A troca de senha ainda não está disponível no servidor. Em breve!");
   });
 }
 

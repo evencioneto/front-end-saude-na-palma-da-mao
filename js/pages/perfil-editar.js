@@ -1,6 +1,7 @@
 // Editar perfil: nome, telefone e e-mail do paciente (PUT /usuarios/:id). A foto ainda não tem suporte na API.
+// Hoje o servidor só deixa o administrador usar /usuarios: para o paciente a gravação volta 403 e a tela avisa.
 import { exigirLogin, PERFIS } from "../core/guard.js";
-import { usuarioApi } from "../services/usuarioService.js";
+import { usuarioApi, pacienteApi } from "../services/usuarioService.js";
 import { sessao as sessaoLocal } from "../core/session.js";
 import { h, $, toast, comBotaoOcupado } from "../core/dom.js";
 import { barraPac } from "../ui/fluxoPaciente.js";
@@ -29,10 +30,10 @@ async function iniciar(s) {
     form,
   );
 
-  // O telefone não fica na sessão: busca o cadastro para preencher o campo.
+  // O telefone não fica na sessão: vem do cadastro do paciente (o usuário vem embutido) para preencher o campo.
   try {
-    const u = await usuarioApi.buscar(s.idUsuario);
-    if (u && !telefone.input.value) telefone.input.value = formatarTelefone(u.telefone ?? "");
+    const p = s.idPaciente ? await pacienteApi.buscar(s.idPaciente) : null;
+    if (p?.usuario && !telefone.input.value) telefone.input.value = formatarTelefone(p.usuario.telefone ?? "");
   } catch {
     /* segue com o campo vazio */
   }
@@ -57,7 +58,7 @@ async function iniciar(s) {
       toast("Perfil atualizado.", "sucesso");
       setTimeout(() => location.assign("perfil.html"), 600);
     } catch (err) {
-      toast(err.message, "erro");
+      toast(err.status === 403 ? "O servidor ainda não permite alterar estes dados. Procure o atendimento." : err.message, "erro");
     }
   });
 }

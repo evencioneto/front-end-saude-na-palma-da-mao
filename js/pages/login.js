@@ -19,6 +19,7 @@ function iniciar() {
   if (PERFIL_ESCOLHIDO && PERFIL_ESCOLHIDO.tipo !== PERFIS.PACIENTE) $("#cadastro").hidden = true;
   const erro = $("#erro");
   const aviso = $("#aviso-lento");
+  if (new URLSearchParams(location.search).has("expirou")) erro.textContent = "Sua sessão expirou. Entre novamente.";
 
   window.addEventListener("api:lenta", () => (aviso.hidden = false));
   window.addEventListener("api:ociosa", () => (aviso.hidden = true));

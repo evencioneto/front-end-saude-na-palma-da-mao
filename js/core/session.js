@@ -1,7 +1,8 @@
 import { SESSION_KEY } from "../config.js";
 
 // Sessão guardada no navegador. Nunca armazena a senha.
-// Formato: { idUsuario, nome, email, tipo, idPaciente?, idProfissional? }
+// Formato: { idUsuario, nome, email, tipo, token, idPaciente?, idProfissional? }
+// O token (JWT) vem do POST /auth/login e é enviado em todas as chamadas à API (ver core/http.js).
 // "lembrar" = true  -> localStorage (continua conectado ao reabrir o navegador)
 // "lembrar" = false -> sessionStorage (vale só até fechar a aba)
 const ler = (storage) => {
@@ -36,6 +37,9 @@ export const sessao = {
       }
       return;
     }
+  },
+  token() {
+    return this.get()?.token ?? null;
   },
   limpar() {
     for (const storage of [sessionStorage, localStorage]) {

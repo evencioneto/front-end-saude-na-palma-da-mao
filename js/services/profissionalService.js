@@ -1,4 +1,4 @@
-import { crud } from "../core/http.js";
+import { crud, http } from "../core/http.js";
 import { toProfissional, toVinculo } from "../mappers/index.js";
 import { usuarioApi } from "./usuarioService.js";
 
@@ -11,6 +11,17 @@ const profEspecialidades = crud("/profissional-especialidade");
 export const profissionalService = {
   async listar() {
     return (await profissionais.listar()).map(toProfissional);
+  },
+
+  // GET /profissionais é só do administrador. Para os demais perfis, o profissional vem embutido nos vínculos,
+  // mas sem o usuário: o nome aparece como "Profissional N" até o servidor liberar a leitura.
+  async listarPelosVinculos() {
+    const [porClinica, porEspecialidade] = await Promise.all([vinculos.listar(), profEspecialidades.listar()]);
+    const porId = new Map();
+    for (const x of [...porClinica, ...porEspecialidade]) {
+      if (x.profissional && !porId.has(String(x.profissional.id_profissional))) porId.set(String(x.profissional.id_profissional), toProfissional(x.profissional));
+    }
+    return [...porId.values()].sort((a, b) => a.id - b.id);
   },
 
   async buscar(id) {

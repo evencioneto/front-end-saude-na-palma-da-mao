@@ -3,13 +3,17 @@
 import { clinicaService } from "../services/clinicaService.js";
 import { especialidadeService } from "../services/especialidadeService.js";
 import { profissionalService } from "../services/profissionalService.js";
+import { ApiError } from "../core/http.js";
+
+// Clínicas e profissionais podem ser negados (403) a quem não é administrador: nesse caso usa os dados embutidos nos vínculos.
+const ouPeloVinculo = (promessa, alternativa) => promessa.catch((erro) => (erro instanceof ApiError && erro.status === 403 ? alternativa() : Promise.reject(erro)));
 
 export async function carregarCatalogo({ incluirInativos = false } = {}) {
   const apenasAtivas = !incluirInativos;
   const [clinicas, especialidades, profissionais, vinculos, clinEsp, profEsp] = await Promise.all([
-    clinicaService.listar({ apenasAtivas }),
+    ouPeloVinculo(clinicaService.listar({ apenasAtivas }), () => clinicaService.listarPelosVinculos({ apenasAtivas })),
     especialidadeService.listar({ apenasAtivas }),
-    profissionalService.listar(),
+    ouPeloVinculo(profissionalService.listar(), () => profissionalService.listarPelosVinculos()),
     profissionalService.listarVinculos({ apenasAtivos: apenasAtivas }),
     clinicaService.listarEspecialidades(),
     profissionalService.listarEspecialidades(),

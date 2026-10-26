@@ -1,4 +1,4 @@
-import { crud } from "../core/http.js";
+import { crud, http } from "../core/http.js";
 import { toClinica } from "../mappers/index.js";
 
 const clinicas = crud("/clinicas");
@@ -12,6 +12,18 @@ export const clinicaService = {
 
   async buscar(id) {
     return toClinica(await clinicas.buscar(id));
+  },
+
+  // GET /clinicas é só do administrador. Para os demais perfis, as clínicas vêm embutidas nos vínculos
+  // (clínica-especialidade e profissional-clínica). Clínica sem nenhum vínculo não aparece por este caminho.
+  async listarPelosVinculos({ apenasAtivas = true } = {}) {
+    const [porEspecialidade, porProfissional] = await Promise.all([clinicaEspecialidades.listar(), http("/profissional-clinica")]);
+    const porId = new Map();
+    for (const x of [...porEspecialidade, ...porProfissional]) {
+      if (x.clinica && !porId.has(String(x.clinica.id_clinica))) porId.set(String(x.clinica.id_clinica), toClinica(x.clinica));
+    }
+    const lista = [...porId.values()].sort((a, b) => a.id - b.id);
+    return apenasAtivas ? lista.filter((c) => c.ativo) : lista;
   },
 
   // [{ idClinica, idEspecialidade }]
