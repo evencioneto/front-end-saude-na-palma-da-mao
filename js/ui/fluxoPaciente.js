@@ -46,11 +46,11 @@ export function buscaPac(placeholder, aoDigitar) {
 }
 
 // Rodapé fixo: Voltar (contorno) e Continuar (cheio). Retorna { el, continuar }.
-export function rodapePac({ aoVoltar, aoContinuar, rotulo = "Continuar", habilitado = false }) {
+export function rodapePac({ aoVoltar, aoContinuar, rotulo = "Continuar", habilitado = false, embutido = false }) {
   const continuar = h("button", { class: "pac-btn", type: "button", onclick: aoContinuar, disabled: !habilitado }, rotulo);
   const el = h(
     "div",
-    { class: "pac-rodape" },
+    { class: embutido ? "pac-rodape pac-rodape--embutido" : "pac-rodape" },
     h("button", { class: "pac-btn pac-btn--contorno", type: "button", onclick: aoVoltar }, "Voltar"),
     continuar,
   );

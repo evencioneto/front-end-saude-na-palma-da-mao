@@ -1,4 +1,4 @@
-// Agendamento (Figma, 6 passos): especialidade -> local -> profissional -> data -> horário -> (passo 6 ainda sem Figma) -> "Pronto!".
+// Agendamento (Figma, 6 passos): especialidade -> local -> profissional -> data -> horário -> confirmar -> "Consulta marcada!".
 // Regras de negócio calculadas aqui porque a API não filtra nem valida conflitos.
 import { exigirLogin, PERFIS } from "../core/guard.js";
 import { h, $, toast, comBotaoOcupado } from "../core/dom.js";
@@ -8,7 +8,7 @@ import { normalizar, iniciais } from "../ui/fluxo.js";
 import { carregarCatalogo } from "../ui/catalogo.js";
 import { disponibilidadeService } from "../services/disponibilidadeService.js";
 import { agendamentoService } from "../services/agendamentoService.js";
-import { formatarData, formatarDataLonga, gerarHorarios, hojeISO, agoraHHMM } from "../core/datetime.js";
+import { formatarData, dataCurta, gerarHorarios, hojeISO, agoraHHMM } from "../core/datetime.js";
 import { registrarPwa } from "../pwa.js";
 
 const ORDEM = ["idEspecialidade", "idClinica", "idVinculo", "data", "hora"];
@@ -26,7 +26,7 @@ const iconeEspecialidade = (nome) => ICONES_ESPECIALIDADE.find(([r]) => r.test(n
 const vazio = (texto) => h("p", { class: "pac-vazio" }, texto);
 
 let eu, cat, disponibilidades, agendamentos;
-const estado = { passo: 0, idEspecialidade: null, idClinica: null, idVinculo: null, data: null, hora: null, obs: "", mes: null, filtroClinica: null };
+const estado = { passo: 0, idEspecialidade: null, idClinica: null, idVinculo: null, data: null, hora: null, mes: null, filtroClinica: null };
 const busca = { texto: "" };
 
 async function iniciar(s) {
@@ -65,7 +65,8 @@ async function iniciar(s) {
 }
 
 // ---------- Regras de disponibilidade ----------
-function horariosLivres(idVinculo, data) {
+// Todos os horários do dia para o vínculo, marcando os que já não estão livres (ocupados ou que já passaram).
+function horariosDoDia(idVinculo, data) {
   const janelas = disponibilidades.filter(
     (d) => d.idVinculo === idVinculo && d.data === data && d.status === "DISPONIVEL",
   );
@@ -75,9 +76,12 @@ function horariosLivres(idVinculo, data) {
       .map((a) => a.hora),
   );
   const todos = new Set(janelas.flatMap((j) => gerarHorarios(j)));
-  let livres = [...todos].filter((hh) => !ocupados.has(hh)).sort();
-  if (data === hojeISO()) livres = livres.filter((hh) => hh > agoraHHMM());
-  return livres;
+  const passou = (hh) => data === hojeISO() && hh <= agoraHHMM();
+  return [...todos].sort().map((hora) => ({ hora, livre: !ocupados.has(hora) && !passou(hora) }));
+}
+
+function horariosLivres(idVinculo, data) {
+  return horariosDoDia(idVinculo, data).filter((x) => x.livre).map((x) => x.hora);
 }
 
 // Datas futuras com pelo menos um horário livre para o vínculo escolhido.
@@ -141,7 +145,7 @@ function voltar() {
 }
 
 function avancar() {
-  if (estado.passo === 4) confirmar();
+  if (estado.passo === 5) confirmar();
   else if (ORDEM.slice(0, estado.passo + 1).every((c) => estado[c] !== null)) irPara(estado.passo + 1);
 }
 
@@ -150,12 +154,12 @@ let rodape = null;
 
 function atualizarRodape() {
   if (!rodape) return;
-  rodape.continuar.disabled = estado[ORDEM[estado.passo]] === null;
+  rodape.continuar.disabled = estado.passo < 5 && estado[ORDEM[estado.passo]] === null;
 }
 
 function render() {
   const raiz = $("#conteudo");
-  const montadores = [passoEspecialidade, passoLocal, passoProfissional, passoData, passoHorario];
+  const montadores = [passoEspecialidade, passoLocal, passoProfissional, passoData, passoHorario, passoConfirmar];
   const { titulo, sub, corpo } = montadores[estado.passo]();
 
   raiz.replaceChildren(
@@ -168,9 +172,11 @@ function render() {
   rodape = rodapePac({
     aoVoltar: voltar,
     aoContinuar: avancar,
-    rotulo: estado.passo === 4 ? "Confirmar" : "Continuar",
-    habilitado: estado[ORDEM[estado.passo]] !== null,
+    rotulo: estado.passo === 5 ? "Confirmar agendamento" : "Continuar",
+    habilitado: estado.passo === 5 || estado[ORDEM[estado.passo]] !== null,
+    embutido: estado.passo >= 4, // nos dois últimos passos os botões seguem o conteúdo, sem barra fixa
   });
+  $("#pagina").classList.toggle("pac-pag--rodape", estado.passo < 4);
   $("#rodape").replaceChildren(rodape.el);
 }
 
@@ -391,29 +397,61 @@ function passoData() {
 }
 
 function passoHorario() {
-  const livres = horariosLivres(estado.idVinculo, estado.data);
+  const dia = horariosDoDia(estado.idVinculo, estado.data);
   const corpo = [];
-  if (livres.length === 0) {
+  if (!dia.some((x) => x.livre)) {
     corpo.push(vazio("Não há mais horários livres neste dia. Volte e escolha outra data."));
   } else {
     const grade = h(
       "div",
       { class: "pac-horarios", role: "radiogroup", "aria-label": `Horários em ${formatarData(estado.data)}` },
-      livres.map((hh) =>
+      dia.map(({ hora, livre }) =>
         h("button", {
-          type: "button", role: "radio", class: "pac-horario", "data-hora": hh, "aria-checked": String(hh === estado.hora),
+          type: "button", role: "radio", class: "pac-horario", "data-hora": hora, "aria-checked": String(hora === estado.hora), disabled: !livre,
+          "aria-label": livre ? hora : `${hora}, indisponível`,
           onclick: () => {
-            escolher("hora", hh, { avancar: false });
-            grade.querySelectorAll("[data-hora]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.hora === hh)));
+            escolher("hora", hora, { avancar: false });
+            grade.querySelectorAll("[data-hora]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.hora === hora)));
           },
-        }, hh),
+        }, hora),
       ),
     );
-    const obs = h("textarea", { id: "obs", rows: "3", maxlength: "500", placeholder: "Ex.: preciso de acompanhante...", oninput: (e) => (estado.obs = e.target.value) });
-    obs.value = estado.obs;
-    corpo.push(grade, h("div", { class: "pac-obs" }, h("label", { for: "obs" }, "Observação (opcional)"), obs));
+    corpo.push(grade, h("p", { class: "pac-horarios__nota" }, "Horários riscados não estão disponíveis."));
   }
-  return { titulo: "Escolha um horário", sub: "Selecione o melhor horário para você.", corpo };
+  return { titulo: "Escolha o horário", sub: "Selecione um horário disponível para o atendimento.", corpo };
+}
+
+// Passo 6: resumo para conferir antes de gravar.
+function dadosDoResumo() {
+  const clinica = cat.clinicaPorId.get(estado.idClinica);
+  const esp = cat.especialidadePorId.get(estado.idEspecialidade);
+  const vinc = cat.vinculoPorId.get(estado.idVinculo);
+  const prof = cat.profissionalPorId.get(vinc?.idProfissional);
+  return { clinica, esp, prof };
+}
+
+function passoConfirmar() {
+  const { clinica, esp, prof } = dadosDoResumo();
+  const endereco = [clinica?.ruaNumero, clinica?.cidadeUf].filter(Boolean).join(", ");
+  const linhas = [
+    ["Especialidade", esp?.nome],
+    ["Clínica", clinica?.nome],
+    ["Profissional", prof?.nome],
+    ["Data", dataCurta(estado.data)],
+    ["Horário", estado.hora],
+    ["Endereço", endereco],
+  ].filter(([, v]) => v);
+  return {
+    titulo: "Confirmar agendamento",
+    sub: "Revise os dados antes de confirmar.",
+    corpo: [
+      h(
+        "dl",
+        { class: "pac-resumo" },
+        linhas.map(([rotulo, valor]) => h("div", { class: "pac-resumo__linha" }, h("dt", {}, rotulo), h("dd", {}, valor))),
+      ),
+    ],
+  };
 }
 
 // ---------- confirmação ----------
@@ -427,7 +465,6 @@ async function confirmar() {
         idEspecialidade: estado.idEspecialidade,
         data: estado.data,
         hora: estado.hora,
-        observacao: estado.obs.trim(),
       }),
     );
     mostrarPronto();
@@ -436,6 +473,7 @@ async function confirmar() {
       // Alguém pegou o horário antes: atualiza a lista e volta para a escolha do horário.
       agendamentos = await agendamentoService.listar().catch(() => agendamentos);
       estado.hora = null;
+      estado.passo = 4;
       render();
       toast(err.message, "erro");
     } else {
@@ -445,10 +483,8 @@ async function confirmar() {
 }
 
 function mostrarPronto() {
-  const clinica = cat.clinicaPorId.get(estado.idClinica);
-  const esp = cat.especialidadePorId.get(estado.idEspecialidade);
-  const vinc = cat.vinculoPorId.get(estado.idVinculo);
-  const prof = cat.profissionalPorId.get(vinc?.idProfissional);
+  const { clinica, prof } = dadosDoResumo();
+  const linhas = [["Profissional", prof?.nome], ["Data", dataCurta(estado.data)], ["Horário", estado.hora], ["Local", clinica?.nome]].filter(([, v]) => v);
 
   $("#barra").replaceChildren();
   $("#rodape").replaceChildren();
@@ -456,24 +492,20 @@ function mostrarPronto() {
   const raiz = $("#conteudo");
   raiz.className = "pac-pronto";
   raiz.replaceChildren(
-    h("img", { src: "icons/ui/sucesso.png", alt: "", width: "96", height: "96" }),
-    h("h1", { class: "pac-h1", tabindex: "-1" }, "Pronto!"),
-    h("p", { class: "pac-pronto__texto" }, "Seu atendimento foi agendado."),
-    h("p", { class: "pac-pronto__texto" }, "Você poderá acessar as informações em “Consultas”."),
+    iconePac("ok-grande", 80),
+    h("h1", { class: "pac-h1", tabindex: "-1" }, "Consulta marcada!"),
+    h("p", { class: "pac-pronto__texto" }, "Seu agendamento foi confirmado com sucesso."),
     h(
-      "section",
+      "dl",
       { class: "pac-pronto__card", "aria-label": "Resumo do agendamento" },
-      h("strong", {}, "Seu atendimento"),
-      h("p", {}, esp?.nome, prof ? h("br") : null, prof?.nome),
-      h("p", {}, clinica?.nome, h("br"), clinica?.ruaNumero, clinica?.ruaNumero ? h("br") : null, clinica?.cidadeUf),
-      h("p", {}, formatarDataLonga(estado.data)),
-      h("p", {}, `${estado.hora}h`),
+      linhas.map(([rotulo, valor]) => h("div", { class: "pac-pronto__linha" }, h("dt", {}, rotulo), h("dd", {}, valor))),
     ),
+    h("p", { class: "pac-pronto__texto pac-pronto__nota" }, "Você pode cancelar esta consulta até 24h antes do horário agendado."),
     h(
       "div",
-      { class: "pac-res__acoes" },
-      h("a", { class: "pac-btn", href: "agendamentos.html" }, "Ver meus agendamentos"),
-      h("a", { class: "pac-btn pac-btn--contorno", href: "home.html" }, "Voltar para o início"),
+      { class: "pac-pronto__acoes" },
+      h("a", { class: "pac-btn", href: "agendamentos.html" }, "Ver minhas consultas"),
+      h("a", { class: "pac-btn pac-btn--texto", href: "home.html" }, "Voltar ao início"),
     ),
   );
   window.scrollTo(0, 0);

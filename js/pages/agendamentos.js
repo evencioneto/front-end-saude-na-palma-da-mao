@@ -4,7 +4,7 @@ import { h, $, toast, comBotaoOcupado } from "../core/dom.js";
 import { avisoDeErro } from "../ui/layout.js";
 import { barraPac, iconePac } from "../ui/fluxoPaciente.js";
 import { montarNavPaciente, definirSelo } from "../ui/navPaciente.js";
-import { confirmarPac } from "../ui/dialogoPaciente.js";
+import { confirmarCancelamento } from "../ui/dialogoPaciente.js";
 import { carregarCatalogo } from "../ui/catalogo.js";
 import { agendamentoService, contarConsultasEmAberto } from "../services/agendamentoService.js";
 import { dataCurta, hojeISO, agoraHHMM } from "../core/datetime.js";
@@ -15,12 +15,8 @@ const ABAS = [
   { chave: "concluidas", rotulo: "Concluídas" },
   { chave: "canceladas", rotulo: "Canceladas" },
 ];
-const ROTULO_STATUS = { PENDENTE: "Pendente", CONFIRMADO: "Confirmada", CONCLUIDO: "Concluída", CANCELADO: "Cancelada" };
-const VAZIO = {
-  proximas: "Você não tem consultas marcadas.",
-  concluidas: "Você ainda não tem consultas concluídas.",
-  canceladas: "Você não tem consultas canceladas.",
-};
+const ROTULO_STATUS = { PENDENTE: "Próxima", CONFIRMADO: "Próxima", CONCLUIDO: "Concluída", CANCELADO: "Cancelada" };
+const HORAS_PARA_CANCELAR = 24;
 
 let eu, cat, todas;
 let abaAtual = "proximas";
@@ -93,9 +89,8 @@ function desenhar() {
     itens.length
       ? itens.map(cartao)
       : [
-          h("p", { class: "pac-vazio" }, VAZIO[abaAtual]),
-          abaAtual === "proximas" ? h("a", { class: "pac-btn pac-cons__novo", href: "agendamento.html" }, "Agendar atendimento") : null,
-        ].filter(Boolean),
+          h("div", { class: "pac-cons__vazio" }, iconePac("busca-vazia", 56), h("p", {}, "Nenhuma consulta encontrada.")),
+        ],
   );
   raiz.replaceChildren(abas, painel);
 }
@@ -112,7 +107,7 @@ function cartao(a) {
   const emAberto = ["PENDENTE", "CONFIRMADO"].includes(a.status);
   const passou = quando(a) < `${hojeISO()} ${agoraHHMM()}`;
   const rotulo = emAberto && passou ? "Encerrada" : (ROTULO_STATUS[a.status] ?? a.status);
-  const status = emAberto && passou ? "ENCERRADO" : a.status;
+  const status = emAberto && passou ? "ENCERRADO" : emAberto ? "PROXIMA" : a.status;
   const endereco = [clinica?.ruaNumero || clinica?.endereco, clinica?.cidadeUf].filter(Boolean).join(" — ");
 
   return h(
@@ -134,14 +129,25 @@ function cartao(a) {
       endereco ? linha("cons-local", endereco) : null,
     ),
     a.observacao ? h("p", { class: "pac-consulta__obs" }, `Obs.: ${a.observacao}`) : null,
-    emAberto && !passou ? botaoCancelar(a) : null,
+    emAberto && !passou ? h("div", { class: "pac-consulta__acoes" }, botaoCancelar(a)) : null,
   );
 }
 
+// Falta pelo menos 24 h para a consulta? (data e hora locais, como o resto da tela)
+function podeCancelar(a) {
+  const [ano, mes, dia] = a.data.split("-").map(Number);
+  const [hh, mm] = a.hora.split(":").map(Number);
+  return new Date(ano, mes - 1, dia, hh, mm).getTime() - Date.now() >= HORAS_PARA_CANCELAR * 3600 * 1000;
+}
+
 function botaoCancelar(a) {
-  const b = h("button", { class: "pac-btn pac-btn--perigo-contorno pac-consulta__cancelar", type: "button" }, "Cancelar consulta");
+  const b = h("button", { class: "pac-btn pac-btn--perigo", type: "button" }, "Cancelar consulta");
   b.addEventListener("click", async () => {
-    if (!(await confirmarPac("Deseja cancelar esta consulta?", "Cancelar consulta"))) return;
+    if (!(await confirmarCancelamento())) return;
+    if (!podeCancelar(a)) {
+      toast(`O cancelamento só é possível com ${HORAS_PARA_CANCELAR} horas de antecedência.`, "erro");
+      return;
+    }
     try {
       await comBotaoOcupado(b, "Cancelando...", () => agendamentoService.alterarStatus(a.id, "CANCELADO"));
       toast("Consulta cancelada.", "sucesso");

@@ -306,14 +306,12 @@ body.pac-flx { background: var(--p-fundo); }
 .pac-cal__leg .l-nao { background: #f3f4f6; }
 .pac-cal__leg .l-sel { background: var(--p-verde); }
 
-/* ===== Horários (passo 5, enquanto o Figma dele não chega) ===== */
-.pac-horarios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px; }
-.pac-horario { height: 52px; padding: 0; border: 0; border-radius: 12px; background: var(--p-verde-claro); box-shadow: 0 0 0 1.15px var(--p-verde-borda); color: var(--p-verde-esc); font-size: 16.9px; font-weight: 700; cursor: pointer; }
-.pac-horario[aria-checked="true"] { background: var(--p-verde); color: #fff; }
-.pac-obs { margin-top: 20px; }
-.pac-obs label { display: block; font-size: 16.7px; line-height: 24px; font-weight: 700; color: var(--p-texto-2); }
-.pac-obs textarea { display: block; width: 100%; min-height: 96px; margin-top: 8px; padding: 12px 16px; box-sizing: border-box; border: 0; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); color: var(--p-texto); font-size: 16px; line-height: 24px; resize: vertical; }
-.pac-obs textarea:focus-visible { outline: 3px solid var(--p-verde); outline-offset: 3px; }
+/* ===== Horários (passo 5) e resumo (passo 6) ===== */
+.pac-horarios { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 17px; }
+.pac-horario { height: 56.6px; padding: 0; border: 0; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); color: var(--p-texto); font-size: 17.7px; font-weight: 700; cursor: pointer; }
+.pac-horario[aria-checked="true"] { background: var(--p-verde); box-shadow: 0 0 0 1.1px var(--p-verde); color: #fff; }
+.pac-horario:disabled { background: #f9fafb; box-shadow: 0 0 0 1.1px #f3f4f6; color: #d1d5db; opacity: 0.65; text-decoration: line-through; text-decoration-thickness: 1px; cursor: not-allowed; }
+.pac-horarios__nota { margin: 16px 0 0; font-size: 16.2px; line-height: 24px; color: var(--p-texto-2); }
 
 /* ===== Rodapé do fluxo ===== */
 .pac-rodape {
@@ -321,16 +319,26 @@ body.pac-flx { background: var(--p-fundo); }
   display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #fff; border-top: 1.1px solid var(--p-verde-borda); box-shadow: 0 -4px 14px rgb(31 41 55 / .06);
 }
 .pac-rodape .pac-btn { height: 60.9px; }
+.pac-rodape--embutido { position: static; margin-top: 16px; padding: 0 20px 40px; background: none; border: 0; box-shadow: none; }
+.pac-rodape--embutido .pac-btn { height: auto; min-height: 60.9px; padding-block: 18.5px; }
 
-/* ===== Agendamento concluído (provisório até o Figma do passo 6) ===== */
-.pac-pronto { padding: 56px 20px 40px; text-align: center; }
-.pac-pronto img { width: 96px; height: 96px; margin: 0 auto; }
-.pac-pronto .pac-h1 { margin-top: 16px; }
-.pac-pronto__texto { margin-top: 8px; font-size: 16.9px; line-height: 24px; color: var(--p-texto-2); }
-.pac-pronto__card { margin-top: 24px; padding: 19.1px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); text-align: left; }
-.pac-pronto__card strong { display: block; font-size: 17.6px; line-height: 28px; color: var(--p-texto); }
-.pac-pronto__card p { margin-top: 6px; font-size: 16.2px; line-height: 24px; color: var(--p-texto-2); }
-.pac-pronto .pac-res__acoes { margin-top: 24px; }
+.pac-resumo { margin: 17px 0 0; padding: 20px 20.9px 21.8px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); display: grid; gap: 15px; }
+.pac-resumo__linha { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; font-size: 16.9px; line-height: 24px; }
+.pac-resumo dt { flex: none; color: var(--p-texto-2); }
+.pac-resumo dd { min-width: 0; margin: 0; font-weight: 700; color: var(--p-texto); text-align: right; overflow-wrap: anywhere; }
+
+/* ===== Consulta marcada! ===== */
+.pac-pronto { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; min-height: 100dvh; padding: 24px; box-sizing: border-box; text-align: center; }
+.pac-pronto > img { width: 80px; height: 80px; }
+.pac-pronto .pac-h1 { margin-top: 18px; }
+.pac-pronto__texto { margin: 8px 0 0; font-size: 16.9px; line-height: 26px; color: var(--p-texto-2); }
+.pac-pronto__card { display: grid; gap: 11px; width: fit-content; max-width: 100%; margin: 22px 0 0; padding: 21px; box-sizing: border-box; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); text-align: left; }
+.pac-pronto__linha { display: flex; justify-content: space-between; gap: 4px; font-size: 16.9px; line-height: 24px; }
+.pac-pronto__linha dt { flex: none; color: var(--p-texto-2); }
+.pac-pronto__linha dd { min-width: 0; margin: 0; font-weight: 700; color: var(--p-texto); text-align: right; overflow-wrap: anywhere; }
+.pac-pronto__nota { margin-top: 17px; }
+.pac-pronto__acoes { display: grid; gap: 16px; width: 100%; margin-top: 18px; }
+.pac-btn--texto { height: auto; padding: 16px; background: transparent; color: var(--p-verde-esc); font-size: 16.9px; font-weight: 600; }
 
 @media (max-width: 359px) {
   .pac-bar__titulo { font-size: 16px; }
@@ -347,29 +355,34 @@ body.pac-flx { background: var(--p-fundo); }
 /* Minhas consultas */
 .pac-cons { padding: 0 20px 40px; }
 .pac-abas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4.4px; }
-.pac-aba { height: 52px; padding: 0; border: 0; border-radius: 12px; background: transparent; box-shadow: 0 0 0 1.1px var(--p-contorno); color: var(--p-texto-2); font-size: 16.5px; line-height: 24px; font-weight: 700; cursor: pointer; }
+.pac-aba { height: 52px; padding: 0; border: 0; border-radius: 12px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); color: var(--p-texto-2); font-size: 16.5px; line-height: 24px; font-weight: 700; cursor: pointer; }
 .pac-aba[aria-selected="true"] { background: var(--p-verde); box-shadow: none; color: #fff; }
-.pac-cons__lista { display: grid; gap: 13px; margin-top: 16px; }
+.pac-cons__lista { display: grid; gap: 13px; margin-top: 17px; }
 .pac-consulta { padding: 21.1px 20.9px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-verde-borda), 0 6px 16px rgb(15 122 109 / .1); }
 .pac-consulta__topo { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
 .pac-consulta__clinica { flex: 1; min-width: 0; margin: 0; font-size: 17.8px; line-height: 27px; font-weight: 700; color: var(--p-texto); overflow-wrap: anywhere; }
 .pac-pilula { flex: none; display: inline-flex; align-items: center; height: 33px; padding: 0 11px; box-sizing: border-box; border-radius: 999px; background: #f3f4f6; color: var(--p-texto-2); font-size: 15.5px; line-height: 20px; font-weight: 700; }
 .pac-pilula[data-status="CANCELADO"] { background: #fee2e2; color: var(--p-vermelho); }
-.pac-pilula[data-status="CONFIRMADO"] { background: var(--p-verde-claro); color: var(--p-verde-esc); }
-.pac-pilula[data-status="PENDENTE"] { background: #fef3c7; color: #92400e; }
+.pac-pilula[data-status="PROXIMA"] { background: var(--p-verde-claro); color: var(--p-verde-esc); }
 .pac-consulta__dados { display: grid; gap: 10.6px; margin: 15.8px 0 0; padding: 0; list-style: none; }
 .pac-consulta__dados li { display: grid; grid-template-columns: 16px 1fr; align-items: center; gap: 12px; font-size: 16.7px; line-height: 26.4px; color: var(--p-texto-2); }
 .pac-consulta__dados img { width: 24px; height: 24px; margin: 0 -4px; }
 .pac-consulta__dados span { min-width: 0; overflow-wrap: anywhere; }
 .pac-consulta__obs { margin-top: 12px; font-size: 15px; line-height: 22px; color: var(--p-texto-3); overflow-wrap: anywhere; }
-.pac-consulta__cancelar { height: 48px; margin-top: 16px; font-size: 16px; }
-.pac-cons__novo { margin-top: 16px; }
-.pac-dialogo { width: min(340px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: 16px; background: #fff; color: var(--p-texto); box-shadow: 0 12px 40px rgb(31 41 55 / .3); }
-.pac-dialogo::backdrop { background: rgb(31 41 55 / .5); }
-.pac-dialogo__corpo { padding: 24px 20px 20px; }
-.pac-dialogo__msg { font-size: 17px; line-height: 26px; font-weight: 600; text-align: center; }
-.pac-dialogo__acoes { display: grid; gap: 10px; margin-top: 20px; }
-.pac-dialogo__acoes .pac-btn { height: 52px; font-size: 16px; }
+.pac-consulta__acoes { margin-top: 20px; padding-top: 16px; border-top: 1.1px solid #e5e7eb; }
+.pac-cons__vazio { display: grid; justify-items: center; gap: 12px; padding-top: 48px; text-align: center; }
+.pac-cons__vazio img { width: 56px; height: 56px; }
+.pac-cons__vazio p { margin: 0; font-size: 16.9px; line-height: 26px; color: var(--p-texto-2); }
+/* Folha de cancelamento (modal que sobe da base) */
+.pac-folha { position: fixed; inset: auto 0 0 0; width: 100%; max-width: 404px; max-height: 92vh; margin: 0 auto; padding: 0; border: 0; border-radius: 24px 24px 0 0; background: #fff; color: var(--p-texto); overflow-y: auto; }
+.pac-folha::backdrop { background: rgb(0 0 0 / .5); }
+.pac-folha__corpo { display: grid; justify-items: center; padding: 24px 24px calc(24px + env(safe-area-inset-bottom)); text-align: center; }
+.pac-folha__corpo > img { width: 56px; height: 56px; }
+.pac-folha__titulo { margin: 18px 0 0; font-size: 17.7px; line-height: 26px; font-weight: 700; }
+.pac-folha__msg { margin: 9.5px 0 0; font-size: 16.9px; line-height: 26px; color: var(--p-texto-2); }
+.pac-folha__aviso { width: 100%; margin: 25.5px 0 0; padding: 18px 30px; box-sizing: border-box; border-radius: 12px; background: #fef3c7; box-shadow: 0 0 0 1.1px #f59e0b; color: #92400e; font-size: 16.9px; line-height: 26px; font-weight: 600; }
+.pac-folha .pac-btn { margin-top: 12px; }
+.pac-folha__aviso + .pac-btn { margin-top: 20px; }
 
 /* Notificações */
 .pac-notif { display: grid; gap: 12px; padding-top: 16px; padding-bottom: 40px; }

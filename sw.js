@@ -2,7 +2,7 @@
 // - App shell (HTML/CSS/JS): pré-cacheado; páginas usam rede primeiro e caem para o cache offline.
 // - API (outra origem): NUNCA é interceptada nem cacheada, pois traz dados de saúde e de usuários.
 // Ao publicar uma nova versão, aumente CACHE_VERSION para limpar os caches antigos.
-const CACHE_VERSION = "v14";
+const CACHE_VERSION = "v15";
 const CACHE = `spm-${CACHE_VERSION}`;
 
 const SHELL = [
@@ -191,6 +191,9 @@ const SHELL = [
   "js/ui/navInferior.js",
   "js/ui/fluxoPaciente.js",
   "js/ui/navPaciente.js",
+  "icons/pac/ok-grande.svg",
+  "icons/pac/lixeira.svg",
+  "icons/pac/busca-vazia.svg",
   "icons/pac/perfil-senha.svg",
   "icons/pac/perfil-sair.svg",
   "icons/pac/perfil-editar.svg",
