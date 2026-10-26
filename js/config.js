@@ -1,5 +1,8 @@
 // Configuração central do front-end.
-export const API_URL = "https://backend-saude-na-palma-da-mao-express.onrender.com/api/v1";
+export const API_URL =
+  typeof location !== "undefined" && location.hostname.includes("onrender.com")
+    ? "https://backend-saude-na-palma-da-mao-express.onrender.com/api/v1"
+    : "http://localhost:3000/api/v1";
 
 export const SESSION_KEY = "spm_sessao";
 
