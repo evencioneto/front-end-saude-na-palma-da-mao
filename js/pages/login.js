@@ -48,7 +48,10 @@ function iniciar() {
         erro.textContent = `Esta conta não é de ${PERFIL_ESCOLHIDO.nome}. Volte e escolha o perfil correto.`;
         return;
       }
-      location.href = paginaInicial(dados.tipo);
+      toast("Login realizado com sucesso! Entrando...", "sucesso");
+      setTimeout(() => {
+        location.href = paginaInicial(dados.tipo);
+      }, 400);
     } catch (err) {
       erro.textContent = err.message;
     }

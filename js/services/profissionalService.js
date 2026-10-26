@@ -4,6 +4,24 @@ import { usuarioApi } from "./usuarioService.js";
 
 const soDigitos = (v) => String(v ?? "").replace(/\D/g, "");
 
+// Cria o usuário do profissional com a senha criptografada pelo servidor.
+// POST /usuarios grava a senha SEM hash e o login (bcrypt) nunca aceitaria; por isso o usuário nasce
+// em /auth/cadastro (público, com hash) e o administrador muda o tipo para PROFISSIONAL em seguida.
+async function criarUsuarioProfissional({ nome, email, telefone, senha }) {
+  const u = await http("/auth/cadastro", {
+    method: "POST",
+    autenticar: false,
+    body: { nome, email: String(email).trim().toLowerCase(), senha, telefone: telefone || null },
+  });
+  try {
+    await usuarioApi.atualizar(u.id_usuario, { tipo_usuario: "PROFISSIONAL" });
+  } catch (erro) {
+    await usuarioApi.remover(u.id_usuario).catch(() => {});
+    throw erro;
+  }
+  return u;
+}
+
 const profissionais = crud("/profissionais");
 const vinculos = crud("/profissional-clinica");
 const profEspecialidades = crud("/profissional-especialidade");
@@ -51,13 +69,7 @@ export const profissionalService = {
   // usuário -> profissional -> vínculo com a clínica -> especialidades.
   // Se alguma etapa falhar, desfaz o que já foi criado.
   async cadastrarCompleto({ usuario, profissional, idClinica, idsEspecialidades }) {
-    const u = await usuarioApi.criar({
-      nome: usuario.nome,
-      email: usuario.email,
-      senha_hash: usuario.senha, // PROVISÓRIO (ver authService)
-      telefone: usuario.telefone,
-      tipo_usuario: "PROFISSIONAL",
-    });
+    const u = await criarUsuarioProfissional({ nome: usuario.nome, email: usuario.email, telefone: usuario.telefone, senha: usuario.senha });
 
     let p = null;
     try {
@@ -93,15 +105,9 @@ export const profissionalService = {
   },
 
   // Cadastro feito pelo administrador (formulário "Novo profissional").
-  // O formulário não tem senha: a senha inicial PROVISÓRIA é o CPF (só dígitos), até existir o fluxo real de login.
+  // O formulário não tem senha: a senha inicial é o CPF (só dígitos); o profissional entra com o e-mail e o CPF.
   async criarPeloAdmin({ nome, email, telefone, cpf, conselho, registro, uf, ativo, idsClinicas, idsEspecialidades }) {
-    const u = await usuarioApi.criar({
-      nome,
-      email,
-      senha_hash: soDigitos(cpf), // PROVISÓRIO (ver authService)
-      telefone: telefone || null,
-      tipo_usuario: "PROFISSIONAL",
-    });
+    const u = await criarUsuarioProfissional({ nome, email, telefone, senha: soDigitos(cpf) });
     let p = null;
     const vinculosCriados = [];
     const especialidadesCriadas = [];

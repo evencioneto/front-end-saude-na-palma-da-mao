@@ -2,7 +2,7 @@
 // - App shell (HTML/CSS/JS): pré-cacheado; páginas usam rede primeiro e caem para o cache offline.
 // - API (outra origem): NUNCA é interceptada nem cacheada, pois traz dados de saúde e de usuários.
 // Ao publicar uma nova versão, aumente CACHE_VERSION para limpar os caches antigos.
-const CACHE_VERSION = "v19";
+const CACHE_VERSION = "v20";
 const CACHE = `spm-${CACHE_VERSION}`;
 
 const SHELL = [
