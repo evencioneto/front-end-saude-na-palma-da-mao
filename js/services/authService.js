@@ -64,22 +64,26 @@ export const authService = {
   },
 
   async registrarPaciente({ nome, email, senha, telefone, cpf, nascimento, sexo }) {
-    let idUsuario;
+    let idUsuario, token;
     try {
       const u = await http("/auth/cadastro", { method: "POST", body: { nome, email: email.toLowerCase(), senha, telefone }, autenticar: false });
       idUsuario = Number(u.id_usuario);
+      // O cadastro não devolve token; entra em seguida para poder criar o paciente (o servidor pode exigir login).
+      const r = await http("/auth/login", { method: "POST", body: { email: email.toLowerCase(), senha }, autenticar: false });
+      token = r.token;
     } catch (erro) {
       // E-mail já cadastrado pode ser um cadastro que ficou pela metade (usuário criado, paciente não):
       // se a senha confere e ainda não há paciente, o cadastro continua dele.
-      if (erro.status !== 409) throw erro;
+      if (erro.status !== 409 || idUsuario) throw erro;
       const r = await http("/auth/login", { method: "POST", body: { email: email.toLowerCase(), senha }, autenticar: false }).catch(() => null);
       if (!r) throw erro;
       const pacientes = await http("/pacientes", { token: r.token });
       if (pacientes.some((p) => Number(p.id_usuario) === Number(r.usuario.id_usuario))) throw erro;
       idUsuario = Number(r.usuario.id_usuario);
+      token = r.token;
     }
 
-    await pacienteApi.criar({ id_usuario: idUsuario, cpf, data_nascimento: nascimento, sexo: sexo || null });
+    await http("/pacientes", { method: "POST", token, body: { id_usuario: idUsuario, cpf, data_nascimento: nascimento, sexo: sexo || null } });
   },
 
   logout() {
