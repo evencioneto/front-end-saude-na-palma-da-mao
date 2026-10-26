@@ -14,6 +14,15 @@ export function formatarTelefone(v) {
   return d.replace(/^(\d{2})(\d)/, "($1) $2").replace(/(\d{5})(\d)/, "$1-$2");
 }
 
+export function formatarCNPJ(v) {
+  return soDigitos(v)
+    .slice(0, 14)
+    .replace(/^(\d{2})(\d)/, "$1.$2")
+    .replace(/^(\d{2})\.(\d{3})(\d)/, "$1.$2.$3")
+    .replace(/\.(\d{3})(\d)/, ".$1/$2")
+    .replace(/(\d{4})(\d)/, "$1-$2");
+}
+
 export const apenasDigitos = soDigitos;
 
 // Validação dos dígitos verificadores do CPF.

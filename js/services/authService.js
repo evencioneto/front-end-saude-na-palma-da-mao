@@ -1,92 +1,89 @@
-// =====================================================================
-//  AUTENTICAÇÃO PROVISÓRIA
+// Autenticação com JWT (back-end: POST /auth/login e POST /auth/cadastro).
 //
-//  O back-end ainda não tem POST /auth/login nem JWT. Enquanto isso, o
-//  login baixa a lista de usuários e compara e-mail e senha no navegador.
+//  - login: troca e-mail + senha por { token, usuario }. O token vai na sessão e é enviado em toda chamada (core/http.js).
+//  - cadastro: cria o usuário como PACIENTE e, em seguida, o registro de paciente (CPF, nascimento, sexo).
+//  - "Entrar com CPF" continua funcionando: o CPF é trocado pelo e-mail do paciente antes de chamar o login.
 //
-//  Consequências (aceitas só para o MVP/demonstração):
-//   - a API entrega senha_hash de TODOS os usuários a qualquer cliente;
-//   - a "senha" é gravada como foi digitada, sem hash;
-//   - qualquer pessoa pode se passar por outro usuário.
-//
-//  Quando o back-end tiver login real, só ESTE arquivo muda:
-//    login()  -> POST /auth/login, guardar o token em sessao e enviar em http()
-//    registrarPaciente() -> não enviar mais a senha em texto puro
-//  As telas continuam iguais.
-// =====================================================================
+// A senha é conferida e guardada (com hash) só pelo servidor; o app nunca a guarda.
 import { http, ApiError } from "../core/http.js";
 import { sessao } from "../core/session.js";
-import { usuarioApi, pacienteApi } from "./usuarioService.js";
+import { pacienteApi } from "./usuarioService.js";
 
-const normalizar = (s) => String(s ?? "").trim().toLowerCase();
 const apenasDigitos = (s) => String(s ?? "").replace(/\D/g, "");
+const FALHA_LOGIN = "E-mail, CPF ou senha incorretos.";
+
+// Descobre o id de paciente/profissional do usuário que acabou de entrar. Usa só rotas liberadas para qualquer usuário logado.
+async function completarDados(dados, token) {
+  if (dados.tipo === "PACIENTE") {
+    const pacientes = await http("/pacientes", { token });
+    const p = pacientes.find((x) => Number(x.id_usuario) === dados.idUsuario);
+    if (!p) throw new ApiError("Cadastro de paciente incompleto. Procure o atendimento.", 403);
+    dados.idPaciente = Number(p.id_paciente);
+  }
+
+  if (dados.tipo === "PROFISSIONAL") {
+    // /profissionais é só do administrador; os vínculos trazem o profissional embutido.
+    for (const rota of ["/profissional-clinica", "/profissional-especialidade"]) {
+      const lista = await http(rota, { token });
+      const p = lista.map((x) => x.profissional).find((x) => x && Number(x.id_usuario) === dados.idUsuario);
+      if (p) {
+        dados.idProfissional = Number(p.id_profissional);
+        break;
+      }
+    }
+  }
+}
 
 export const authService = {
   // "identificador" pode ser e-mail ou CPF (com ou sem pontuação). CPF só existe para pacientes.
   async login(identificador, senha, { lembrar = true } = {}) {
     const entrada = String(identificador ?? "").trim();
-    const porEmail = entrada.includes("@");
-    const usuarios = await usuarioApi.listar();
-    let pacientes = null;
-    let u;
+    let email = entrada;
 
-    if (porEmail) {
-      u = usuarios.find((x) => normalizar(x.email) === normalizar(entrada));
-    } else {
+    if (!entrada.includes("@")) {
       const cpf = apenasDigitos(entrada);
-      pacientes = await pacienteApi.listar();
-      const p = cpf.length === 11 ? pacientes.find((x) => apenasDigitos(x.cpf) === cpf) : null;
-      u = p && usuarios.find((x) => Number(x.id_usuario) === Number(p.id_usuario));
+      const pacientes = cpf.length === 11 ? await pacienteApi.listar() : [];
+      email = pacientes.find((x) => apenasDigitos(x.cpf) === cpf)?.usuario?.email;
+      if (!email) throw new ApiError(FALHA_LOGIN, 401);
     }
 
-    if (!u || u.senha_hash !== senha) throw new ApiError("E-mail, CPF ou senha incorretos.", 401);
-    if (u.ativo === false) throw new ApiError("Este usuário está inativo.", 403);
-
-    const dados = {
-      idUsuario: Number(u.id_usuario),
-      nome: u.nome,
-      email: u.email,
-      tipo: u.tipo_usuario,
-    };
-
-    if (u.tipo_usuario === "PACIENTE") {
-      pacientes ??= await pacienteApi.listar();
-      const p = pacientes.find((x) => Number(x.id_usuario) === dados.idUsuario);
-      if (!p) throw new ApiError("Cadastro de paciente incompleto. Procure o atendimento.", 403);
-      dados.idPaciente = Number(p.id_paciente);
+    let resposta;
+    try {
+      resposta = await http("/auth/login", { method: "POST", body: { email: email.toLowerCase(), senha }, autenticar: false });
+    } catch (erro) {
+      if (erro.status === 400 || erro.status === 401) throw new ApiError(FALHA_LOGIN, 401);
+      throw erro;
     }
 
-    if (u.tipo_usuario === "PROFISSIONAL") {
-      const profissionais = await http("/profissionais");
-      const p = profissionais.find((x) => Number(x.id_usuario) === dados.idUsuario);
-      if (p) dados.idProfissional = Number(p.id_profissional);
-    }
+    const { token, usuario: u } = resposta;
+    const dados = { idUsuario: Number(u.id_usuario), nome: u.nome, email: u.email, tipo: u.tipo_usuario, token };
+    await completarDados(dados, token);
 
     sessao.set(dados, { lembrar });
     return dados;
   },
 
   async registrarPaciente({ nome, email, senha, telefone, cpf, nascimento, sexo }) {
-    const usuario = await usuarioApi.criar({
-      nome,
-      email,
-      senha_hash: senha, // PROVISÓRIO: o back-end grava exatamente o que recebe
-      telefone,
-      tipo_usuario: "PACIENTE",
-    });
-
+    let idUsuario, token;
     try {
-      await pacienteApi.criar({
-        id_usuario: Number(usuario.id_usuario),
-        cpf,
-        data_nascimento: nascimento,
-        sexo: sexo || null,
-      });
+      const u = await http("/auth/cadastro", { method: "POST", body: { nome, email: email.toLowerCase(), senha, telefone }, autenticar: false });
+      idUsuario = Number(u.id_usuario);
+      // O cadastro não devolve token; entra em seguida para poder criar o paciente (o servidor pode exigir login).
+      const r = await http("/auth/login", { method: "POST", body: { email: email.toLowerCase(), senha }, autenticar: false });
+      token = r.token;
     } catch (erro) {
-      // Sem transação no servidor: desfaz o usuário para não deixar cadastro pela metade.
-      await usuarioApi.remover(usuario.id_usuario).catch(() => {});
-      throw erro;
+      // E-mail já cadastrado pode ser um cadastro que ficou pela metade (usuário criado, paciente não):
+      // se a senha confere e ainda não há paciente, o cadastro continua dele.
+      if (erro.status !== 409 || idUsuario) throw erro;
+      const r = await http("/auth/login", { method: "POST", body: { email: email.toLowerCase(), senha }, autenticar: false }).catch(() => null);
+      if (!r) throw erro;
+      const pacientes = await http("/pacientes", { token: r.token });
+      if (pacientes.some((p) => Number(p.id_usuario) === Number(r.usuario.id_usuario))) throw erro;
+      idUsuario = Number(r.usuario.id_usuario);
+      token = r.token;
     }
+
+    await http("/pacientes", { method: "POST", token, body: { id_usuario: idUsuario, cpf, data_nascimento: nascimento, sexo: sexo || null } });
   },
 
   logout() {

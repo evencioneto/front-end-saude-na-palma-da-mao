@@ -4,41 +4,35 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>TriaOrto+ | Ortopedia e Fisioterapia Ortopédica</title>
-  <meta name="description" content="Agende consultas de ortopedia e fisioterapia ortopédica com facilidade.">
   <meta name="theme-color" content="#f8faf7">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/publica.css">
 </head>
 <body>
-  <main class="tela tela--inicio">
-    <img class="inicio__deco" src="icons/decoracao-topo.svg" alt="" width="175" height="207">
-    <div class="inicio__corpo">
-      <div class="inicio__marca">
-        <img class="logo" src="icons/logo.svg" alt="" width="64" height="64">
-        <h1 class="palavra">
-          <picture>
-            <source srcset="icons/wordmark-escuro.svg" media="(prefers-color-scheme: dark)">
-            <img src="icons/wordmark.svg" alt="TriaOrto+" width="163" height="25">
-          </picture>
-        </h1>
-        <p class="subtitulo-marca">Ortopedia e Fisioterapia Ortopédica</p>
-      </div>
-
-      <hr class="divisor">
-      <p class="lema">Cuidar começa por entender.</p>
-
-      <div class="inicio__acoes">
-        <a class="btn btn--grande btn--bloco" href="login.html">Entrar</a>
-        <a class="btn btn--grande btn--bloco" href="cadastro.html">Cadastrar</a>
-      </div>
-
+  <main class="pub pub-inicio">
+    <div class="pub-inicio__marca">
+      <img class="logo" src="icons/logo.svg" alt="" width="64" height="64">
+      <h1 class="palavra">
+        <picture>
+          <source srcset="icons/wordmark-escuro.svg" media="(prefers-color-scheme: dark)">
+          <img src="icons/wordmark.svg" alt="TriaOrto+" width="168" height="29">
+        </picture>
+      </h1>
+      <p class="pub-inicio__sub">Ortopedia e Fisioterapia Ortopédica</p>
     </div>
-    <div class="ilustracao">
-      <img src="icons/ilustracao.svg" alt="" width="375" height="85">
+
+    <hr class="pub-inicio__traco">
+    <p class="pub-inicio__lema">Cuidar começa por entender.</p>
+
+    <div class="pub-inicio__acoes">
+      <a class="pub-btn" href="entrar.html">Entrar</a>
+      <a class="pub-btn pub-btn--contorno" href="cadastro.html">Cadastrar</a>
     </div>
+    <div class="pub-inicio__ilustracao"><img src="icons/ilustracao.svg" alt="" width="390" height="116"></div>
   </main>
   <script type="module" src="js/pages/publica.js"></script>
 </body>

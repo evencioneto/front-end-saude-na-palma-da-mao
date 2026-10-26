@@ -15,7 +15,6 @@ const form = $("#form-cadastro");
 const erro = $("#erro");
 const aviso = $("#aviso-lento");
 const botao = $("#btn-continuar");
-const pilula = $("#pilula");
 
 window.addEventListener("api:lenta", () => (aviso.hidden = false));
 window.addEventListener("api:ociosa", () => (aviso.hidden = true));
@@ -30,12 +29,11 @@ const senha2 = $("#senha2");
 const conferirSenhas = () =>
   senha2.setCustomValidity(senha.value === senha2.value ? "" : "As senhas não são iguais.");
 
-const secaoAtual = () => $(`.etapa[data-etapa="${etapa}"]`);
+const secaoAtual = () => $(`.pub-cad__etapa[data-etapa="${etapa}"]`);
 const etapaValida = () => $$("input, select", secaoAtual()).every((c) => c.checkValidity());
 
 function mostrarEtapa({ focar = true } = {}) {
-  $$(".etapa").forEach((s) => (s.hidden = Number(s.dataset.etapa) !== etapa));
-  pilula.textContent = `Etapa ${etapa} de ${TOTAL_ETAPAS}`;
+  $$(".pub-cad__etapa").forEach((s) => (s.hidden = Number(s.dataset.etapa) !== etapa));
   botao.textContent = etapa < TOTAL_ETAPAS ? "Continuar" : "Criar conta";
   erro.textContent = "";
   conferirSenhas();
@@ -43,7 +41,9 @@ function mostrarEtapa({ focar = true } = {}) {
   if (focar) $("input, select", secaoAtual())?.focus(); // só ao trocar de etapa (evita abrir o teclado ao entrar)
 }
 
-form.addEventListener("input", () => {
+form.addEventListener("input", (e) => {
+  // Campo com texto muda a borda (Figma: Cadastro 2). O input de data também entra aqui.
+  e.target.classList.toggle("is-preenchido", e.target.value !== "");
   conferirSenhas();
   botao.disabled = !etapaValida();
 });
@@ -52,8 +52,10 @@ $("#btn-voltar").addEventListener("click", () => {
   if (etapa > 1) {
     etapa--;
     mostrarEtapa();
+  } else if (history.length > 1) {
+    history.back(); // volta para o login de onde veio "Cadastre-se"
   } else {
-    location.href = "index.html";
+    location.href = "login.html?perfil=paciente";
   }
 });
 

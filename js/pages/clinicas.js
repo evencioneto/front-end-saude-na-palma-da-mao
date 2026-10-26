@@ -1,51 +1,58 @@
+// Clínicas (paciente): lista com busca. Cada cartão leva aos detalhes da clínica.
+// O Figma mostra distância e horário de funcionamento, mas a API não tem esses dados: no lugar vão as especialidades.
 import { exigirLogin, PERFIS } from "../core/guard.js";
-import { montarLayout, avisoDeErro } from "../ui/layout.js";
-import { h, $, carregando, estadoVazio } from "../core/dom.js";
+import { h, $ } from "../core/dom.js";
+import { avisoDeErro } from "../ui/layout.js";
+import { barraPac, buscaPac, iconePac } from "../ui/fluxoPaciente.js";
+import { montarNavPaciente } from "../ui/navPaciente.js";
+import { normalizar } from "../ui/fluxo.js";
 import { carregarCatalogo, nomesDasEspecialidades } from "../ui/catalogo.js";
-import { formatarTelefone, apenasDigitos } from "../ui/mascaras.js";
+import { registrarPwa } from "../pwa.js";
 
-async function iniciar(s) {
-  montarLayout(s);
-  const raiz = $("#conteudo");
-  raiz.replaceChildren(h("h1", {}, "Clínicas parceiras"), carregando("Carregando clínicas..."));
+let cat;
+let texto = "";
 
-  try {
-    const cat = await carregarCatalogo();
-    const conteudo = [h("h1", {}, "Clínicas parceiras")];
-
-    if (cat.clinicas.length === 0) {
-      conteudo.push(estadoVazio("Nenhuma clínica cadastrada no momento."));
-    } else {
-      conteudo.push(h("div", { class: "grade" }, cat.clinicas.map((c) => cartao(c, cat, s))));
-    }
-    raiz.replaceChildren(...conteudo);
-  } catch (err) {
-    raiz.replaceChildren(h("h1", {}, "Clínicas parceiras"), avisoDeErro(err.message));
-  }
-}
-
-function cartao(c, cat, s) {
+function cartao(c) {
   const ids = cat.clinEsp.filter((x) => x.idClinica === c.id).map((x) => x.idEspecialidade);
   const especialidades = nomesDasEspecialidades(cat, ids);
-  const tel = apenasDigitos(c.telefone);
-
   return h(
-    "article",
-    { class: "card" },
-    h("h2", {}, c.nome),
-    h("p", { class: "card__meta" }, c.endereco || "Endereço não informado"),
-    especialidades ? h("p", {}, h("strong", {}, "Especialidades: "), especialidades) : null,
-    tel ? h("p", { class: "card__meta" }, "Telefone: ", h("a", { href: `tel:${tel}` }, formatarTelefone(tel))) : null,
-    s.tipo === PERFIS.PACIENTE
-      ? h(
-          "div",
-          { class: "card__acoes" },
-          h("a", { class: "btn", href: `agendamento.html?clinica=${c.id}` }, "Agendar nesta clínica"),
-        )
-      : null,
+    "a",
+    { class: "pac-clinica", href: `clinica.html?id=${c.id}` },
+    iconePac("cruz-clinica", 48),
+    h(
+      "span",
+      { class: "pac-clinica__texto" },
+      h("span", { class: "pac-clinica__nome" }, h("span", {}, c.nome), c.ativo ? null : h("span", { class: "pac-pilula pac-pilula--inativa" }, "Inativa")),
+      h("span", { class: "pac-clinica__linha" }, iconePac("pin-cinza", 13), h("span", {}, [c.ruaNumero, c.cidadeUf].filter(Boolean).join(", ") || "Endereço não informado")),
+      especialidades ? h("span", { class: "pac-clinica__linha pac-clinica__esp" }, h("span", {}, especialidades)) : null,
+    ),
+    h("span", { class: "pac-clinica__seta", "aria-hidden": "true" }, iconePac("chevron-menu")),
   );
 }
 
-// Inicia só depois de todas as declarações do módulo (evita acessar let/const antes da inicialização).
-const sessao = exigirLogin();
-if (sessao) iniciar(sessao);
+function desenharLista(lista) {
+  const alvo = normalizar(texto);
+  const itens = cat.clinicas.filter((c) => !alvo || normalizar(`${c.nome} ${c.endereco}`).includes(alvo));
+  lista.replaceChildren(...(itens.length ? itens.map(cartao) : [h("p", { class: "pac-vazio" }, "Nenhuma clínica encontrada.")]));
+  lista.setAttribute("aria-label", `${itens.length} clínica${itens.length === 1 ? "" : "s"}`);
+}
+
+async function iniciar() {
+  registrarPwa();
+  $("#barra").replaceChildren(barraPac("Clínicas", "home.html"));
+  montarNavPaciente("inicio");
+  const raiz = $("#conteudo");
+  raiz.replaceChildren(h("p", { class: "pac-vazio", role: "status" }, "Carregando clínicas..."));
+  try {
+    cat = await carregarCatalogo({ incluirInativos: true });
+    const lista = h("div", { class: "pac-clin__lista", role: "list" });
+    const busca = buscaPac("Buscar clínica...", (t) => ((texto = t), desenharLista(lista)));
+    raiz.replaceChildren(busca, lista);
+    desenharLista(lista);
+  } catch (err) {
+    raiz.replaceChildren(avisoDeErro(err.message));
+  }
+}
+
+const sessao = exigirLogin([PERFIS.PACIENTE]);
+if (sessao) iniciar();

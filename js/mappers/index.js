@@ -9,6 +9,7 @@ export const toClinica = (c) => ({
   id: num(c.id_clinica),
   nome: c.nome,
   cnpj: c.cnpj,
+  bairro: c.bairro ?? "",
   telefone: c.telefone ?? "",
   email: c.email ?? "",
   endereco: [
@@ -45,6 +46,8 @@ export const toPaciente = (p) => ({
   idUsuario: num(p.id_usuario),
   cpf: p.cpf,
   nascimento: p.data_nascimento,
+  sexo: p.sexo ?? "",
+  criadoEm: p.usuario?.criado_em ?? null,
   usuario: p.usuario ? toUsuario(p.usuario) : null,
 });
 
@@ -59,6 +62,7 @@ export const toProfissional = (p) => ({
   nome: p.usuario?.nome ?? `Profissional ${p.id_profissional}`,
   email: p.usuario?.email ?? "",
   telefone: p.usuario?.telefone ?? "",
+  criadoEm: p.usuario?.criado_em ?? null,
 });
 
 export const toVinculo = (v) => ({

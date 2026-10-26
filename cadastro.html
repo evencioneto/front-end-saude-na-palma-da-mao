@@ -10,72 +10,80 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/publica.css">
 </head>
 <body>
-  <main class="tela">
-    <div class="barra">
-      <button id="btn-voltar" class="botao-circulo" type="button" aria-label="Voltar">
-        <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+  <main class="pub pub-cad">
+    <header class="pub-cad__topo">
+      <button id="btn-voltar" class="pub-cad__voltar" type="button" aria-label="Voltar">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M12.496 14.9954L7.49756 9.99699L12.496 4.99854" stroke="currentColor" stroke-width="2.08269" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <h1>Criar conta</h1>
-      <span class="botao-circulo" aria-hidden="true"><img src="icons/logo.svg" alt=""></span>
-    </div>
+      <h1 class="pub-cad__titulo">Criar conta</h1>
+      <span class="pub-cad__selo" aria-hidden="true"><img src="icons/ui/cad-cruz.svg" alt="" width="18" height="18"></span>
+    </header>
 
-    <span id="pilula" class="pilula-etapa" aria-live="polite">Etapa 1 de 2</span>
-
-    <div id="aviso-lento" class="alerta alerta--aviso" role="status" hidden>
-      Acordando o servidor, isso pode levar até 1 minuto...
-    </div>
-
-    <form id="form-cadastro" class="formulario" novalidate style="flex:1;display:flex;flex-direction:column">
-      <section class="etapa formulario" data-etapa="1" aria-labelledby="t1">
-        <div>
-          <h2 id="t1" class="etapa-titulo">Seus dados pessoais</h2>
-          <p class="etapa-sub">Preencha as informações abaixo</p>
-        </div>
-        <div class="campo">
-          <label for="nome">Nome completo</label>
-          <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Como você se chama" required minlength="3" maxlength="150">
-        </div>
-        <div class="campo">
-          <label for="cpf">CPF</label>
-          <input id="cpf" name="cpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" required maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}">
-        </div>
-        <div class="campo">
-          <label for="nascimento">Data de nascimento</label>
-          <input id="nascimento" name="nascimento" type="date" autocomplete="bday" required>
-        </div>
-      </section>
-
-      <section class="etapa formulario" data-etapa="2" aria-labelledby="t2" hidden>
-        <div>
-          <h2 id="t2" class="etapa-titulo">Contato e acesso</h2>
-          <p class="etapa-sub">Usaremos estes dados para você entrar</p>
-        </div>
-        <div class="campo">
-          <label for="telefone">Telefone com DDD</label>
-          <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(81) 99999-8888" required maxlength="15">
-        </div>
-        <div class="campo">
-          <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" autocomplete="email" placeholder="seu@email.com" required maxlength="150">
-        </div>
-        <div class="campo">
-          <label for="senha">Senha</label>
-          <input id="senha" name="senha" type="password" autocomplete="new-password" placeholder="Mínimo de 6 caracteres" required minlength="6">
-        </div>
-        <div class="campo">
-          <label for="senha2">Repita a senha</label>
-          <input id="senha2" name="senha2" type="password" autocomplete="new-password" placeholder="Digite a senha de novo" required minlength="6">
-        </div>
-      </section>
-
-      <div class="rodape-tela">
-        <p id="erro" class="erro-form" role="alert"></p>
-        <button id="btn-continuar" class="btn btn--grande btn--bloco" type="submit" disabled>Continuar</button>
-        <p>Já tem conta? <a href="login.html">Entrar</a></p>
+    <div class="pub-cad__corpo">
+      <div id="aviso-lento" class="alerta alerta--aviso" role="status" hidden>
+        Acordando o servidor, isso pode levar até 1 minuto...
       </div>
-    </form>
+
+      <form id="form-cadastro" class="pub-cad__form" novalidate>
+        <!-- Figma: Cadastro 1 (vazio) e Cadastro 2 (preenchendo) -->
+        <section class="pub-cad__etapa" data-etapa="1" aria-labelledby="cad-t1">
+          <div class="pub-cad__cabeca">
+            <span class="pub-cad__pilula">Etapa 1 de 2</span>
+            <h2 id="cad-t1" class="pub-cad__h2">Seus dados pessoais</h2>
+            <p class="pub-cad__sub">Preencha as informações abaixo</p>
+          </div>
+          <div class="pub-cad__campos">
+            <div class="pub-cad__campo">
+              <label for="nome">Nome completo</label>
+              <input id="nome" name="nome" type="text" autocomplete="name" placeholder="Como você se chama" required minlength="3" maxlength="150">
+            </div>
+            <div class="pub-cad__campo">
+              <label for="cpf">CPF</label>
+              <input id="cpf" name="cpf" type="text" inputmode="numeric" autocomplete="off" placeholder="000.000.000-00" required maxlength="14" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}">
+            </div>
+            <div class="pub-cad__campo">
+              <label for="nascimento">Data de nascimento</label>
+              <input id="nascimento" name="nascimento" type="date" autocomplete="bday" required>
+            </div>
+          </div>
+        </section>
+
+        <!-- Figma: Cadastro 3 -->
+        <section class="pub-cad__etapa" data-etapa="2" aria-labelledby="cad-t2" hidden>
+          <div class="pub-cad__cabeca">
+            <span class="pub-cad__pilula">Etapa 2 de 2</span>
+            <h2 id="cad-t2" class="pub-cad__h2">Contato e acesso</h2>
+            <p class="pub-cad__sub">Quase lá! Só mais alguns dados.</p>
+          </div>
+          <div class="pub-cad__campos">
+            <div class="pub-cad__campo">
+              <label for="telefone">Telefone</label>
+              <input id="telefone" name="telefone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="(00) 00000-0000" required maxlength="15">
+            </div>
+            <div class="pub-cad__campo">
+              <label for="email">E-mail</label>
+              <input id="email" name="email" type="email" autocomplete="email" autocapitalize="none" spellcheck="false" placeholder="seuemail@exemplo.com" required maxlength="150">
+            </div>
+            <div class="pub-cad__campo">
+              <label for="senha">Senha</label>
+              <input id="senha" name="senha" type="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres" required minlength="8">
+            </div>
+            <div class="pub-cad__campo">
+              <label for="senha2">Confirmar senha</label>
+              <input id="senha2" name="senha2" type="password" autocomplete="new-password" placeholder="Repita a senha" required minlength="8">
+            </div>
+          </div>
+        </section>
+
+        <div class="pub-cad__acoes">
+          <p id="erro" class="erro-form" role="alert"></p>
+          <button id="btn-continuar" class="pub-cad__btn" type="submit" disabled>Continuar</button>
+        </div>
+      </form>
+    </div>
   </main>
   <script type="module" src="js/pages/cadastro.js"></script>
 </body>

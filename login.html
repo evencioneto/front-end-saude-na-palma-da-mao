@@ -10,60 +10,51 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/publica.css">
 </head>
 <body>
-  <main class="tela tela--login">
-    <img class="inicio__deco" src="icons/decoracao-topo.svg" alt="" width="175" height="207">
+  <main class="pub pub-login">
+    <a id="voltar" class="pub-voltar" href="entrar.html" aria-label="Voltar para a escolha de perfil"><svg viewBox="0 0 5 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 1 1 5l3.2 4"/></svg><span>Voltar</span></a>
+    <div class="pub-selo"><img src="icons/logo.svg" alt=""></div>
+    <h1 class="pub-login__marca">
+      <picture>
+        <source srcset="icons/ui/wordmark-login-escuro.svg" media="(prefers-color-scheme: dark)">
+        <img src="icons/ui/wordmark-login.svg" alt="TriaOrto+" width="119" height="19">
+      </picture>
+    </h1>
 
-    <div class="login__corpo">
-      <a class="login__voltar" href="index.html" aria-label="Voltar para o início">
-        <svg class="icone" viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
-      </a>
+    <div id="aviso-lento" class="alerta alerta--aviso pub-login__aviso" role="status" hidden>
+      Acordando o servidor. A primeira entrada pode levar até 1 minuto, aguarde...
+    </div>
 
-      <img class="logo" src="icons/logo.svg" alt="" width="64" height="64">
-      <h1 class="palavra">
-        <picture>
-          <source srcset="icons/wordmark-escuro.svg" media="(prefers-color-scheme: dark)">
-          <img src="icons/wordmark.svg" alt="TriaOrto+" width="163" height="25">
-        </picture>
-      </h1>
-
-      <div id="aviso-lento" class="alerta alerta--aviso" role="status" hidden>
-        Acordando o servidor. A primeira entrada pode levar até 1 minuto, aguarde...
+    <form id="form-login" class="pub-login__form" novalidate>
+      <label class="pub-rotulo" for="identificador">E-mail ou CPF</label>
+      <div class="pub-campo">
+        <input id="identificador" name="identificador" type="text" inputmode="email"
+               autocomplete="username" autocapitalize="none" spellcheck="false"
+               placeholder="seuemail@exemplo.com" required>
+      </div>
+      <label class="pub-rotulo" for="senha">Senha</label>
+      <div class="pub-campo">
+        <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
       </div>
 
-      <form id="form-login" class="login__form" novalidate>
-        <div class="campo-icone">
-          <img src="icons/ui/usuario.png" alt="" width="25" height="25">
-          <label class="sr-only" for="identificador">E-mail ou CPF</label>
-          <input id="identificador" name="identificador" type="text" inputmode="email"
-                 autocomplete="username" autocapitalize="none" spellcheck="false"
-                 placeholder="E-mail ou cpf" required>
-        </div>
-        <div class="campo-icone">
-          <img src="icons/ui/cadeado.svg" alt="" width="25" height="25">
-          <label class="sr-only" for="senha">Senha</label>
-          <input id="senha" name="senha" type="password" autocomplete="current-password" placeholder="Senha" required>
-        </div>
+      <div class="pub-linha">
+        <label class="pub-check"><input id="lembrar" name="lembrar" type="checkbox"><span>Lembrar senha</span></label>
+        <a id="esqueci" class="pub-link" href="#">Esqueceu a senha?</a>
+      </div>
 
-        <div class="login__linha">
-          <label class="check"><input id="lembrar" name="lembrar" type="checkbox"><span>Lembrar senha</span></label>
-          <a id="esqueci" href="#">Esqueceu a senha?</a>
-        </div>
+      <p id="erro" class="erro-form" role="alert"></p>
+      <button class="pub-btn" type="submit">Entrar</button>
+    </form>
 
-        <p id="erro" class="erro-form" role="alert"></p>
-        <button class="btn btn--grande btn--bloco" type="submit">Entrar</button>
-      </form>
+    <div class="pub-ou" aria-hidden="true"><span>ou</span></div>
+    <button id="btn-google" class="pub-google" type="button">
+      <img src="icons/ui/google.png" alt="" width="16" height="16">
+      <span>Entrar com o Google</span>
+    </button>
 
-      <div class="ou" aria-hidden="true"><span>ou</span></div>
-
-      <button id="btn-google" class="btn-google" type="button">
-        <img src="icons/ui/google.png" alt="" width="30" height="30">
-        <span>Entrar com o Google</span>
-      </button>
-
-      <p class="login__cadastro">Ainda não tem uma conta?<br><a href="cadastro.html">Cadastre-se</a></p>
-    </div>
+    <p id="cadastro" class="pub-login__cadastro">Ainda não tem uma conta? <a href="cadastro.html">Cadastre-se</a></p>
   </main>
   <script type="module" src="js/pages/login.js"></script>
 </body>

@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escolha seu perfil | TriaOrto+</title>
+  <meta name="theme-color" content="#f8faf7">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/publica.css">
+</head>
+<body>
+  <main class="pub pub-perfil">
+    <a class="pub-voltar" href="index.html" aria-label="Voltar para o início"><svg viewBox="0 0 5 10" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4.2 1 1 5l3.2 4"/></svg><span>Voltar</span></a>
+    <div class="pub-selo"><img src="icons/logo.svg" alt=""></div>
+    <h1 class="pub-perfil__titulo">Como você vai usar o TriaOrto?</h1>
+    <p class="pub-perfil__sub">Escolha o seu perfil de acesso</p>
+
+    <nav class="pub-perfil__lista" aria-label="Perfis de acesso">
+      <a class="pub-opcao" href="login.html?perfil=paciente">
+        <img class="pub-opcao__icone" src="icons/ui/perfil-paciente.svg" alt="" width="48" height="48">
+        <span class="pub-opcao__texto"><span class="pub-opcao__titulo">Sou paciente</span><span class="pub-opcao__desc">Agendar consultas e acompanhar meu atendimento</span></span>
+        <svg class="pub-opcao__seta" viewBox="0 0 5 9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m.8.8 3.4 3.7L.8 8.2"/></svg>
+      </a>
+      <a class="pub-opcao" href="login.html?perfil=profissional">
+        <img class="pub-opcao__icone" src="icons/ui/perfil-profissional.svg" alt="" width="48" height="48">
+        <span class="pub-opcao__texto"><span class="pub-opcao__titulo">Sou profissional de saúde</span><span class="pub-opcao__desc">Gerenciar minha agenda e disponibilidade</span></span>
+        <svg class="pub-opcao__seta" viewBox="0 0 5 9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m.8.8 3.4 3.7L.8 8.2"/></svg>
+      </a>
+      <a class="pub-opcao" href="login.html?perfil=administrador">
+        <img class="pub-opcao__icone" src="icons/ui/perfil-admin.svg" alt="" width="48" height="48">
+        <span class="pub-opcao__texto"><span class="pub-opcao__titulo">Sou administrador</span><span class="pub-opcao__desc">Gerenciar clínicas, profissionais e pacientes</span></span>
+        <svg class="pub-opcao__seta" viewBox="0 0 5 9" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m.8.8 3.4 3.7L.8 8.2"/></svg>
+      </a>
+    </nav>
+  </main>
+  <script type="module" src="js/pages/publica.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+/* Telas públicas do Figma (início, escolha de perfil, login). Medidas em px do frame de 390 px. */
+.pub {
+  --pub-texto2: #4b5563;
+  --pub-borda: #d1d5db;
+  --pub-tile: #ddeee1;
+  --pub-icone: #9ca3af;
+  width: 100%; max-width: 390px; min-height: 100vh; min-height: 100dvh; margin-inline: auto;
+  padding: 0 24px; display: flex; flex-direction: column; position: relative;
+  background: var(--cor-fundo);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .pub { --pub-texto2: #a5bfb8; --pub-borda: #2c4741; --pub-tile: #123a34; --pub-icone: #6f8b84; }
+}
+.pub img { display: block; }
+
+/* ---------- Início ---------- */
+.pub-inicio { text-align: center; padding-bottom: 0; }
+.pub-inicio__marca { margin-top: clamp(40px, 11vh, 92px); display: grid; justify-items: center; }
+.pub-inicio__marca .logo { width: 64px; height: 64px; }
+.pub-inicio__marca .palavra { margin: 20px 0 0; line-height: 0; }
+.pub-inicio__marca .palavra img { width: 168px; height: auto; }
+.pub-inicio__sub { margin: 12px 0 0; font-size: 15px; line-height: 20px; color: var(--pub-texto2); }
+.pub-inicio__traco { width: 40px; height: 2px; margin: 20px auto 0; border: 0; border-radius: 1px; background: var(--cor-realce); }
+.pub-inicio__lema { margin: 19px auto 0; max-width: 200px; font-size: 24px; line-height: 30px; font-weight: 700; color: var(--cor-texto); }
+.pub-inicio__acoes { margin-top: auto; padding-top: 32px; display: grid; gap: 12px; }
+.pub-inicio__ilustracao { margin: 44px -24px 0; line-height: 0; }
+.pub-inicio__ilustracao img { width: 100%; height: auto; }
+
+.pub-btn {
+  display: inline-flex; align-items: center; justify-content: center; width: 100%; min-height: 56px;
+  border-radius: 12px; border: 1px solid var(--cor-primaria); background: var(--cor-primaria); color: #fff;
+  font: inherit; font-size: 16px; font-weight: 700; text-decoration: none; cursor: pointer;
+}
+.pub-btn:hover:not(:disabled) { background: var(--cor-primaria-escura); border-color: var(--cor-primaria-escura); }
+.pub-btn:disabled { background: var(--cor-desabilitado); border-color: var(--cor-desabilitado); color: var(--cor-desabilitado-texto); cursor: not-allowed; }
+.pub-btn--contorno { background: transparent; color: var(--cor-primaria); }
+.pub-btn--contorno:hover:not(:disabled) { background: var(--cor-primaria-clara); border-color: var(--cor-primaria); color: var(--cor-primaria-escura); }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .pub-btn:not(.pub-btn--contorno) { color: #06231e; } }
+
+/* ---------- Voltar ---------- */
+.pub-voltar {
+  align-self: flex-start; display: inline-flex; align-items: center; gap: 16px; min-height: 44px; margin: 40px 0 0 -8px; padding: 0 8px;
+  font-size: 14px; font-weight: 600; color: var(--cor-primaria); text-decoration: none; border-radius: 8px;
+}
+.pub-voltar svg { width: 5px; height: 10px; flex: none; }
+.pub-voltar:hover { text-decoration: underline; }
+.pub-voltar:focus-visible, .pub-btn:focus-visible, .pub-opcao:focus-visible, .pub-link:focus-visible { outline: 3px solid var(--cor-realce); outline-offset: 2px; }
+
+.pub-selo { display: grid; place-items: center; background: var(--pub-tile); }
+.pub-selo img { width: 50%; height: 50%; }
+
+/* ---------- Escolha de perfil ---------- */
+.pub-perfil .pub-voltar { margin-top: 48px; }
+.pub-perfil .pub-selo { width: 56px; height: 56px; border-radius: 16px; margin: 24px auto 0; }
+.pub-perfil__titulo { margin: 16px 0 0; text-align: center; font-size: 20px; line-height: 26px; font-weight: 700; color: var(--cor-texto); }
+.pub-perfil__sub { margin: 8px 0 0; text-align: center; font-size: 14px; line-height: 20px; color: var(--pub-texto2); }
+.pub-perfil__lista { margin-top: 30px; display: grid; gap: 12px; }
+.pub-opcao {
+  display: flex; align-items: center; gap: 16px; min-height: 88px; padding: 16px 28px 16px 16px; border-radius: 16px;
+  background: var(--cor-superficie); border: 1px solid var(--pub-borda); color: inherit; text-decoration: none;
+  box-shadow: 0 1px 2px rgb(18 51 46 / 0.04);
+}
+.pub-opcao:hover { border-color: var(--cor-primaria); }
+.pub-opcao__icone { width: 48px; height: 48px; flex: none; border-radius: 12px; background: var(--pub-tile); }
+.pub-opcao__texto { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.pub-opcao__titulo { font-size: 16px; line-height: 20px; font-weight: 700; color: var(--cor-texto); }
+.pub-opcao__desc { max-width: 206px; font-size: 12px; line-height: 16px; font-weight: 500; color: var(--pub-texto2); }
+.pub-opcao__seta { width: 5px; height: 9px; flex: none; margin-right: -12px; color: var(--pub-icone); }
+
+/* ---------- Login ---------- */
+.pub-login .pub-voltar { margin-top: 40px; }
+.pub-login .pub-selo { width: 64px; height: 64px; border-radius: 18px; margin: 16px auto 0; }
+.pub-login .pub-selo img { width: 32px; height: 32px; }
+.pub-login__marca { margin: 18px auto 0; line-height: 0; }
+.pub-login__marca img { width: 119px; height: auto; }
+.pub-login__aviso { margin-top: 16px; }
+.pub-login__form { margin-top: 38px; display: grid; grid-template-columns: minmax(0, 1fr); }
+.pub-rotulo { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--cor-texto); }
+.pub-campo { position: relative; margin-top: 4px; }
+.pub-campo + .pub-rotulo { margin-top: 16px; }
+.pub-campo input {
+  width: 100%; min-height: 56px; padding: 0 14px 0 42px; border: 1px solid var(--pub-borda); border-radius: 12px;
+  background: var(--cor-superficie); color: var(--cor-texto); font: inherit; font-size: 16px;
+}
+.pub-campo input::placeholder { color: var(--pub-icone); opacity: 1; }
+.pub-campo input:focus-visible { outline: 3px solid var(--cor-realce); outline-offset: 1px; border-color: var(--cor-primaria); }
+.pub-linha { margin-top: 27px; display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; }
+.pub-check { display: inline-flex; align-items: center; gap: 8px; color: var(--pub-texto2); cursor: pointer; white-space: nowrap; }
+.pub-check input {
+  appearance: none; width: 22px; height: 22px; min-height: 0; padding: 0; margin: 0; flex: none; display: grid; place-items: center;
+  border: 1px solid var(--pub-borda); border-radius: 6px; background: var(--cor-superficie); cursor: pointer;
+}
+.pub-check input:checked { background: var(--cor-primaria); border-color: var(--cor-primaria); }
+.pub-check input:checked::after { content: ""; width: 6px; height: 11px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
+.pub-check input:focus-visible { outline: 3px solid var(--cor-realce); outline-offset: 2px; }
+.pub-link { font-weight: 600; color: var(--cor-primaria); text-decoration: none; white-space: nowrap; border-radius: 4px; }
+.pub-link:hover { text-decoration: underline; }
+.pub-login__form .erro-form { margin: 12px 0 0; text-align: center; }
+.pub-login__form .pub-btn { margin-top: 34px; }
+.pub-login__form .erro-form:not(:empty) + .pub-btn { margin-top: 12px; }
+.pub-ou { margin-top: 16px; display: flex; align-items: center; gap: 13px; font-size: 14px; line-height: 16px; color: var(--pub-texto2); }
+.pub-ou::before, .pub-ou::after { content: ""; flex: 1; height: 1px; background: var(--pub-borda); }
+.pub-google {
+  margin-top: 14px; display: flex; align-items: center; justify-content: center; gap: 16px; min-height: 50px; width: 100%;
+  border: 1px solid var(--pub-borda); border-radius: 12px; background: var(--cor-superficie); color: var(--cor-texto);
+  font: inherit; font-size: 15px; font-weight: 500; cursor: pointer;
+}
+.pub-google:hover { background: var(--cor-primaria-clara); }
+.pub-google img { width: 16px; height: 16px; }
+.pub-login__cadastro { margin: 33px 0 32px; text-align: center; font-size: 14px; line-height: 20px; color: var(--pub-texto2); }
+.pub-login__cadastro a { font-weight: 700; color: var(--cor-primaria); text-decoration: none; }
+.pub-login__cadastro a:hover { text-decoration: underline; }
+
+/* ---------- Cadastro do paciente (Figma: Cadastro 1, 2 e 3) ----------
+   Medidas do Figma (frame 390 px): topo 12/16 com borda de 1 px, corpo com 24 px de margem e 20 px entre blocos,
+   campos com 16 px entre si e 6 px entre rótulo e caixa. Fonte do Figma: Sora 400/600/700 (SIL OFL, arquivos em css/fonts). */
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 400; font-display: swap; src: url("fonts/sora-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 600; font-display: swap; src: url("fonts/sora-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Sora"; font-style: normal; font-weight: 700; font-display: swap; src: url("fonts/sora-latin-700-normal.woff2") format("woff2"); }
+.pub-cad {
+  --cad-linha: #f3f4f6;
+  --cad-borda-preenchido: #e5e7eb;
+  --cad-placeholder: rgb(31 41 55 / 0.5);
+  --cad-btn-off: #d1d5db;
+  --cad-btn-off-texto: #6b7280;
+  padding: 0;
+  font-family: "Sora", "Plus Jakarta Sans", "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-tema="claro"]) .pub-cad {
+    --cad-linha: #1c332e; --cad-borda-preenchido: #3a5a53; --cad-placeholder: rgb(230 242 239 / 0.5);
+    --cad-btn-off: #2c3b38; --cad-btn-off-texto: #8ea29c;
+  }
+}
+.pub-cad__topo {
+  display: flex; align-items: center; gap: 12px; padding: 12px 16px;
+  background: var(--cor-fundo); border-bottom: 1px solid var(--cad-linha);
+}
+.pub-cad__voltar {
+  width: 44px; height: 44px; min-width: 44px; min-height: 44px; flex: none; padding: 0; border: 0; border-radius: 50%;
+  display: grid; place-items: center; background: var(--pub-tile); color: var(--cor-primaria); cursor: pointer;
+}
+.pub-cad__voltar svg { width: 20px; height: 20px; }
+.pub-cad__voltar:hover { background: var(--cor-realce); }
+.pub-cad__titulo { flex: 1; min-width: 0; margin: 0; text-align: center; font-size: 16px; line-height: 24px; font-weight: 600; color: var(--cor-texto); }
+.pub-cad__selo { width: 40px; height: 40px; flex: none; border-radius: 50%; display: grid; place-items: center; background: var(--pub-tile); }
+.pub-cad__selo img { width: 18px; height: 18px; }
+
+.pub-cad__corpo { flex: 1; display: flex; flex-direction: column; gap: 20px; padding: 24px; }
+.pub-cad__form { flex: 1; display: flex; flex-direction: column; gap: 20px; }
+.pub-cad__etapa { display: flex; flex-direction: column; gap: 20px; }
+.pub-cad__pilula {
+  align-self: stretch; padding: 2px 8px; border-radius: 999px; background: var(--pub-tile);
+  font-size: 12px; line-height: 16px; font-weight: 600; color: var(--cor-primaria);
+}
+.pub-cad__cabeca { display: flex; flex-direction: column; }
+.pub-cad__h2 { margin: 4px 0 0; font-size: 20px; line-height: 28px; font-weight: 700; color: var(--cor-texto); }
+.pub-cad__sub { margin: 4px 0 0; font-size: 14px; line-height: 20px; color: var(--pub-texto2); }
+.pub-cad__campos { display: flex; flex-direction: column; gap: 16px; }
+.pub-cad__campo { display: flex; flex-direction: column; gap: 6px; }
+.pub-cad__campo label { font-size: 14px; line-height: 20px; font-weight: 600; color: var(--cor-texto); }
+.pub-cad__campo input {
+  display: block; width: 100%; height: 54px; padding: 14px 16px; border: 1px solid var(--pub-borda); border-radius: 12px;
+  background: var(--cor-superficie); color: var(--cor-texto); font-family: inherit; font-size: 16px; line-height: 24px;
+  -webkit-appearance: none; appearance: none;
+}
+.pub-cad__campo input::placeholder { color: var(--cad-placeholder); opacity: 1; }
+.pub-cad__campo input.is-preenchido { border-color: var(--cad-borda-preenchido); }
+.pub-cad__campo input:focus-visible { outline: 3px solid var(--cor-realce); outline-offset: 1px; border-color: var(--cor-primaria); }
+.pub-cad__campo input.is-preenchido:user-invalid { border-color: var(--cor-erro); }
+.pub-cad__acoes { margin-top: auto; display: flex; flex-direction: column; }
+.pub-cad__acoes .erro-form { margin: 0 0 12px; text-align: center; }
+.pub-cad__acoes .erro-form:empty { display: none; }
+.pub-cad__btn {
+  width: 100%; min-height: 56px; padding: 16px; border: 0; border-radius: 16px; background: var(--cor-primaria); color: #fff;
+  font-family: inherit; font-size: 16px; line-height: 24px; font-weight: 600; text-align: center; cursor: pointer;
+}
+.pub-cad__btn:hover:not(:disabled) { background: var(--cor-primaria-escura); }
+.pub-cad__btn:disabled { background: var(--cad-btn-off); color: var(--cad-btn-off-texto); cursor: not-allowed; }
+.pub-cad__btn:focus-visible { outline: 3px solid var(--cor-realce); outline-offset: 2px; }
+@media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .pub-cad__btn:not(:disabled) { color: #06231e; } }

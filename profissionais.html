@@ -4,80 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Profissionais | TriaOrto+</title>
-  <meta name="theme-color" content="#0f7a6d">
+  <meta name="theme-color" content="#f8faf7">
   <link rel="manifest" href="manifest.json">
   <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/paciente.css">
 </head>
-<body>
-  <header id="topo"></header>
-  <main id="conteudo" class="container" tabindex="-1"></main>
-
-  <dialog id="dlg-prof" aria-labelledby="dlg-prof-titulo">
-    <div class="dialogo__corpo">
-      <h2 id="dlg-prof-titulo">Novo profissional</h2>
-      <form id="form-prof" class="formulario" novalidate>
-        <div class="campo">
-          <label for="p-nome">Nome completo</label>
-          <input id="p-nome" name="nome" type="text" required minlength="3" maxlength="150">
-        </div>
-        <div class="campos-linha">
-          <div class="campo">
-            <label for="p-email">E-mail</label>
-            <input id="p-email" name="email" type="email" required maxlength="150" autocomplete="off">
-          </div>
-          <div class="campo">
-            <label for="p-telefone">Telefone com DDD</label>
-            <input id="p-telefone" name="telefone" type="tel" inputmode="tel" required maxlength="15" placeholder="(81) 99999-8888">
-          </div>
-        </div>
-        <div class="campos-linha">
-          <div class="campo">
-            <label for="p-senha">Senha inicial</label>
-            <input id="p-senha" name="senha" type="password" required minlength="6" autocomplete="new-password">
-          </div>
-          <div class="campo">
-            <label for="p-cpf">CPF</label>
-            <input id="p-cpf" name="cpf" type="text" inputmode="numeric" required maxlength="14" placeholder="000.000.000-00" pattern="\d{3}\.\d{3}\.\d{3}-\d{2}">
-          </div>
-        </div>
-        <div class="campos-linha">
-          <div class="campo">
-            <label for="p-conselho">Conselho</label>
-            <select id="p-conselho" name="conselho" required>
-              <option value="">Selecione</option>
-              <option value="CRM">CRM (Medicina)</option>
-              <option value="CREFITO">CREFITO (Fisioterapia)</option>
-            </select>
-          </div>
-          <div class="campo">
-            <label for="p-registro">Nº do registro</label>
-            <input id="p-registro" name="registro" type="text" required maxlength="30" placeholder="123456">
-          </div>
-          <div class="campo">
-            <label for="p-uf">UF do registro</label>
-            <input id="p-uf" name="uf" type="text" required maxlength="2" minlength="2" value="PE" pattern="[A-Za-z]{2}" style="text-transform:uppercase">
-          </div>
-        </div>
-        <div class="campo">
-          <label for="p-clinica">Clínica</label>
-          <select id="p-clinica" name="clinica" required></select>
-        </div>
-        <fieldset class="campo">
-          <legend>Especialidades</legend>
-          <div id="p-especialidades"></div>
-        </fieldset>
-        <p id="p-erro" class="erro-form" role="alert"></p>
-        <div class="card__acoes">
-          <button class="btn" type="submit">Cadastrar profissional</button>
-          <button class="btn btn--secundario" type="button" id="p-cancelar">Cancelar</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
-
+<body class="pac pac-flx">
+  <div class="pac-pag">
+    <div id="barra" class="pac-slot"></div>
+    <main id="conteudo" class="pac-corpo pac-prof-lista" tabindex="-1"></main>
+  </div>
   <script type="module" src="js/pages/profissionais.js"></script>
 </body>
 </html>

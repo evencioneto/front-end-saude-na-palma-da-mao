@@ -1,4 +1,8 @@
 // Registra o service worker (funciona em HTTPS ou localhost).
+// Também aplica as preferências de acessibilidade do aparelho assim que a página carrega o módulo.
+import { aplicarAcessibilidade } from "./ui/acessibilidade.js";
+
+aplicarAcessibilidade();
 let registrado = false;
 
 export function registrarPwa() {
