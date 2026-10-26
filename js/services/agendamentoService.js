@@ -46,3 +46,12 @@ export const agendamentoService = {
     await agendamentos.atualizar(id, { status: "CANCELADO", observacao });
   },
 };
+
+const EM_ABERTO = ["PENDENTE", "CONFIRMADO"];
+
+// Quantas consultas futuras o paciente tem em aberto (selo da aba "Consultas" do Início).
+export function contarConsultasEmAberto(agendamentos, idPaciente, hoje, agora) {
+  return agendamentos.filter(
+    (a) => a.idPaciente === idPaciente && EM_ABERTO.includes(a.status) && `${a.data} ${a.hora}` >= `${hoje} ${agora}`,
+  ).length;
+}

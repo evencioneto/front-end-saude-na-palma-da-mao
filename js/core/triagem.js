@@ -26,7 +26,7 @@ const ALERTAS = [
   /desmai/, /falta de ar|dor no peito/, /sangrament|hemorragia/, /insuportav|dor (muito )?intensa|muito forte/,
 ];
 
-export const OPCOES_RAPIDAS = { febre: "febre", dor: "dor", inchaco: "inchaço", lesao: "lesão" };
+export const OPCOES_RAPIDAS = { febre: "febre", dor: "dor", inchaco: "inchaço", lesao: "lesão", limitacao: "limitação de movimento" };
 
 export const MENSAGEM_URGENCIA =
   "Pelo que você descreveu, procure um pronto-atendimento ou ligue para o SAMU (192) agora, sem esperar uma consulta.";

@@ -10,40 +10,50 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/paciente.css">
 </head>
-<body>
-  <main class="tela tela--home">
-    <header class="home__topo">
+<body class="pac">
+  <main id="conteudo" class="pac-tela" tabindex="-1">
+    <header class="pac-topo">
       <div>
-        <h1 id="saudacao" class="home__ola">Olá!</h1>
-        <p class="home__sub">Como podemos ajudar hoje?</p>
+        <h1 id="saudacao" class="pac-topo__titulo">Olá!</h1>
+        <p class="pac-topo__sub">Como podemos ajudar hoje?</p>
       </div>
-      <img class="home__logo" src="icons/logo.svg" alt="TriaOrto+" width="32" height="32">
+      <span class="pac-logo"><img src="icons/pac/cruz-topo.svg" alt="" width="24" height="24"></span>
     </header>
 
-    <section class="home__destaque" aria-label="Mensagem">
-      <img src="icons/ui/mao-coracao.png" alt="" width="96" height="96">
+    <section class="pac-banner" aria-label="Mensagem">
+      <span class="pac-banner__icone"><img src="icons/pac/mao-coracao.png" alt="" width="36" height="36"></span>
       <div>
-        <p class="home__destaque-titulo">Cuidar também é informação.</p>
-        <p class="home__destaque-texto">Estamos aqui para te ajudar a dar o próximo passo.</p>
+        <p class="pac-banner__titulo">Cuidar também é informação.</p>
+        <p class="pac-banner__texto">Estamos aqui para te ajudar a dar o próximo passo.</p>
       </div>
     </section>
 
-    <h2 class="home__pergunta">O que você precisa fazer?</h2>
+    <h2 class="pac-secao">O que você precisa fazer?</h2>
+    <nav class="pac-acoes" aria-label="Ações">
+      <a class="pac-acao" id="acao-triagem" href="pretriagem.html">
+        <span class="pac-icone"><img src="icons/pac/pre-triagem.svg" alt="" width="24" height="24"></span>
+        <span class="pac-acao__texto"><strong class="pac-acao__titulo">Fazer pré-triagem</strong><span class="pac-acao__desc">Conte o que está sentindo e receba orientações da TrIA.</span></span>
+        <img class="pac-acao__seta" src="icons/pac/chevron-dir.svg" alt="" width="24" height="24">
+      </a>
+      <a class="pac-acao" id="acao-agendar" href="agendamento.html">
+        <span class="pac-icone"><img src="icons/pac/agendar.svg" alt="" width="24" height="24"></span>
+        <span class="pac-acao__texto"><strong class="pac-acao__titulo">Agendar atendimento</strong><span class="pac-acao__desc">Busque uma especialidade e escolha o melhor horário.</span></span>
+        <img class="pac-acao__seta" src="icons/pac/chevron-dir.svg" alt="" width="24" height="24">
+      </a>
+      <a class="pac-acao" id="acao-consultar" href="agendamentos.html">
+        <span class="pac-icone"><img src="icons/pac/consultar.svg" alt="" width="24" height="24"></span>
+        <span class="pac-acao__texto"><strong class="pac-acao__titulo">Consultar agendamento</strong><span class="pac-acao__desc">Veja seus atendimentos já marcados.</span></span>
+        <img class="pac-acao__seta" src="icons/pac/chevron-dir.svg" alt="" width="24" height="24">
+      </a>
+    </nav>
 
-    <nav class="home__acoes" aria-label="Ações">
-      <a class="acao" id="acao-triagem" href="pretriagem.html">
-        <span class="acao__circulo" style="--fundo:#a7d7c5"><img src="icons/ui/triagem.png" alt="" width="49" height="49"></span>
-        <span class="acao__texto"><strong>Fazer pré-triagem</strong><span>Conte o que está sentindo e receba orientação.</span></span>
-      </a>
-      <a class="acao" href="agendamento.html">
-        <span class="acao__circulo" style="--fundo:#e7d9f9"><img src="icons/ui/agendar.svg" alt="" width="36" height="37"></span>
-        <span class="acao__texto"><strong>Agendar atendimento</strong><span>Busque uma especialidade e escolha o melhor horário.</span></span>
-      </a>
-      <a class="acao" href="agendamentos.html">
-        <span class="acao__circulo" style="--fundo:#cbe9f8"><img src="icons/ui/consultar.png" alt="" width="45" height="45"></span>
-        <span class="acao__texto"><strong>Consultar agendamento</strong><span>Veja seus atendimentos já marcados.</span></span>
-      </a>
+    <h2 class="pac-secao">Acesso rápido</h2>
+    <nav class="pac-rapidos" aria-label="Acesso rápido">
+      <a class="pac-rapido" href="clinicas.html"><span class="pac-icone"><img src="icons/pac/clinicas.svg" alt="" width="24" height="24"></span>Clínicas</a>
+      <a class="pac-rapido" href="profissionais.html"><span class="pac-icone"><img src="icons/pac/profissionais.svg" alt="" width="24" height="24"></span>Profissionais</a>
+      <a class="pac-rapido" href="agendamento.html"><span class="pac-icone"><img src="icons/pac/especialidades.svg" alt="" width="24" height="24"></span>Especialidades</a>
     </nav>
   </main>
   <script type="module" src="js/pages/home.js"></script>
