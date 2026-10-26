@@ -2,7 +2,7 @@
 // - App shell (HTML/CSS/JS): pré-cacheado; páginas usam rede primeiro e caem para o cache offline.
 // - API (outra origem): NUNCA é interceptada nem cacheada, pois traz dados de saúde e de usuários.
 // Ao publicar uma nova versão, aumente CACHE_VERSION para limpar os caches antigos.
-const CACHE_VERSION = "v12";
+const CACHE_VERSION = "v13";
 const CACHE = `spm-${CACHE_VERSION}`;
 
 const SHELL = [
@@ -72,6 +72,22 @@ const SHELL = [
   "icons/pac/nav-inicio.svg",
   "icons/pac/nav-perfil.svg",
   "icons/pac/ok.svg",
+  "icons/pac/analise-ok.svg",
+  "icons/pac/aviso.png",
+  "icons/pac/cal-ant.svg",
+  "icons/pac/cal-prox.svg",
+  "icons/pac/esp-coluna.svg",
+  "icons/pac/esp-esportiva.svg",
+  "icons/pac/esp-fisioterapia.svg",
+  "icons/pac/esp-joelho.svg",
+  "icons/pac/esp-mao.svg",
+  "icons/pac/esp-ombro.svg",
+  "icons/pac/esp-ortopedia.svg",
+  "icons/pac/esp-traumatologia.svg",
+  "icons/pac/estrela.svg",
+  "icons/pac/passo-ok.svg",
+  "icons/pac/pessoa-resultado.svg",
+  "icons/pac/selecionada.svg",
   "icons/pac/outro.svg",
   "icons/pac/parar.svg",
   "icons/pac/pre-triagem.svg",
@@ -173,6 +189,7 @@ const SHELL = [
   "js/ui/layout.js",
   "js/ui/mascaras.js",
   "js/ui/navInferior.js",
+  "js/ui/fluxoPaciente.js",
   "js/ui/navPaciente.js",
   "js/ui/profissional.js",
   "icons/decoracao-topo.svg",

@@ -1,10 +1,10 @@
-// Agendamento em 5 passos (Figma): especialidade -> local -> profissional -> data -> horário -> "Pronto!".
+// Agendamento (Figma, 6 passos): especialidade -> local -> profissional -> data -> horário -> (passo 6 ainda sem Figma) -> "Pronto!".
 // Regras de negócio calculadas aqui porque a API não filtra nem valida conflitos.
 import { exigirLogin, PERFIS } from "../core/guard.js";
-import { h, $, carregando, estadoVazio, toast, comBotaoOcupado } from "../core/dom.js";
+import { h, $, toast, comBotaoOcupado } from "../core/dom.js";
 import { avisoDeErro } from "../ui/layout.js";
-import { barraFluxo, passos, campoBusca, rodapeFluxo, normalizar, iniciais } from "../ui/fluxo.js";
-import { montarNavInferior, removerNavInferior } from "../ui/navInferior.js";
+import { barraPac, passosPac, buscaPac, rodapePac, iconePac } from "../ui/fluxoPaciente.js";
+import { normalizar, iniciais } from "../ui/fluxo.js";
 import { carregarCatalogo } from "../ui/catalogo.js";
 import { disponibilidadeService } from "../services/disponibilidadeService.js";
 import { agendamentoService } from "../services/agendamentoService.js";
@@ -12,12 +12,18 @@ import { formatarData, formatarDataLonga, gerarHorarios, hojeISO, agoraHHMM } fr
 import { registrarPwa } from "../pwa.js";
 
 const ORDEM = ["idEspecialidade", "idClinica", "idVinculo", "data", "hora"];
-const ICONE_ESPECIALIDADE = [
-  [/preven|recupera|esporte|les[aã]o|lesoes/i, "icons/ui/esp-prevencao.png"],
-  [/reabilit|fortalec|fisio/i, "icons/ui/esp-reabilitacao.png"],
-  [/ortop/i, "icons/ui/esp-ortopedia.png"],
+// Ícone da especialidade pelo nome (o Figma tem um por área); sem correspondência, usa o de ortopedia.
+const ICONES_ESPECIALIDADE = [
+  [/traumat/i, "esp-traumatologia"],
+  [/esport/i, "esp-esportiva"],
+  [/coluna/i, "esp-coluna"],
+  [/joelho/i, "esp-joelho"],
+  [/ombro/i, "esp-ombro"],
+  [/m[aã]o|punho/i, "esp-mao"],
+  [/fisio|reabilit|fortalec|preven/i, "esp-fisioterapia"],
 ];
-const iconeEspecialidade = (nome) => ICONE_ESPECIALIDADE.find(([r]) => r.test(nome))?.[1] ?? "icons/ui/esp-ortopedia.png";
+const iconeEspecialidade = (nome) => ICONES_ESPECIALIDADE.find(([r]) => r.test(nome))?.[1] ?? "esp-ortopedia";
+const vazio = (texto) => h("p", { class: "pac-vazio" }, texto);
 
 let eu, cat, disponibilidades, agendamentos;
 const estado = { passo: 0, idEspecialidade: null, idClinica: null, idVinculo: null, data: null, hora: null, obs: "", mes: null, filtroClinica: null };
@@ -27,8 +33,8 @@ async function iniciar(s) {
   eu = s;
   registrarPwa();
   const raiz = $("#conteudo");
-  $("#barra").replaceChildren(barraFluxo("Agendamento", voltar));
-  raiz.replaceChildren(carregando("Carregando especialidades e horários..."));
+  $("#barra").replaceChildren(barraPac("Agendamento", voltar));
+  raiz.replaceChildren(h("p", { class: "pac-vazio", role: "status" }, "Carregando especialidades e horários..."));
 
   if (!s.idPaciente) {
     raiz.replaceChildren(avisoDeErro("Não encontramos seu cadastro de paciente. Saia e entre novamente."));
@@ -149,82 +155,80 @@ function atualizarRodape() {
 
 function render() {
   const raiz = $("#conteudo");
-  const cabecalho = (titulo, sub) => [passos(estado.passo), h("h1", { class: "fluxo__titulo", tabindex: "-1" }, titulo), h("p", { class: "fluxo__sub" }, sub)];
-
   const montadores = [passoEspecialidade, passoLocal, passoProfissional, passoData, passoHorario];
   const { titulo, sub, corpo } = montadores[estado.passo]();
 
-  raiz.className = "fluxo" + (estado.passo === 0 ? " fluxo--sem-rodape" : "");
-  raiz.replaceChildren(...cabecalho(titulo, sub), ...corpo);
+  raiz.replaceChildren(
+    passosPac(estado.passo),
+    h("h1", { class: "pac-h1 pac-intro", tabindex: "-1" }, titulo),
+    h("p", { class: "pac-sub" }, sub),
+    ...corpo,
+  );
 
-  // Barra inferior só no passo 1; os demais usam Voltar/Continuar.
-  if (estado.passo === 0) {
-    montarNavInferior("inicio");
-    $("#rodape").replaceChildren();
-    rodape = null;
-  } else {
-    removerNavInferior();
-    rodape = rodapeFluxo({
-      aoVoltar: voltar,
-      aoContinuar: avancar,
-      rotulo: estado.passo === 4 ? "Confirmar" : "Continuar",
-      habilitado: estado[ORDEM[estado.passo]] !== null,
-    });
-    $("#rodape").replaceChildren(rodape.el);
-  }
+  rodape = rodapePac({
+    aoVoltar: voltar,
+    aoContinuar: avancar,
+    rotulo: estado.passo === 4 ? "Confirmar" : "Continuar",
+    habilitado: estado[ORDEM[estado.passo]] !== null,
+  });
+  $("#rodape").replaceChildren(rodape.el);
 }
 
 // Lista filtrável: re-desenha só a lista para não perder o foco do campo de busca.
-function listaFiltravel(itens, textoDe, desenhar, vazio) {
-  const caixa = h("div", { class: "lista-filtravel" });
+function listaFiltravel(itens, textoDe, desenhar, textoVazio, rotulo) {
+  const caixa = h("div", { class: "pac-lista", role: "radiogroup", "aria-label": rotulo });
   const desenharLista = () => {
     const termo = normalizar(busca.texto);
     const filtrados = termo ? itens.filter((i) => normalizar(textoDe(i)).includes(termo)) : itens;
-    caixa.replaceChildren(...(filtrados.length ? desenhar(filtrados) : [estadoVazio(vazio)]));
+    caixa.replaceChildren(...(filtrados.length ? desenhar(filtrados, caixa) : [vazio(textoVazio)]));
   };
   desenharLista();
   return { caixa, filtrar: desenharLista };
 }
 
+// Atualiza aria-checked sem redesenhar (mantém foco e rolagem).
+function marcar(caixa, id) {
+  caixa.querySelectorAll("[role=radio]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.valor === String(id))));
+}
+
+function opcao({ classe, valor, selecionado, rotulo, aoEscolher }, ...filhos) {
+  return h(
+    "button",
+    { type: "button", role: "radio", class: `pac-opcao ${classe}`, "data-valor": String(valor), "aria-checked": String(selecionado), "aria-label": rotulo, onclick: aoEscolher },
+    ...filhos,
+  );
+}
+
 function passoEspecialidade() {
   const itens = especialidadesDisponiveis();
+  const dica = h("p", { class: "pac-dica", "aria-live": "polite", hidden: estado.idEspecialidade === null }, "1 especialidade selecionada. Você já pode continuar.");
   const { caixa, filtrar } = listaFiltravel(
     itens,
     (e) => `${e.nome} ${e.descricao}`,
-    (lista) => [
-      h(
-        "div",
-        { class: "grade-esp", role: "group", "aria-label": "Especialidades" },
-        lista.map((e) =>
-          h(
-            "button",
-            { type: "button", class: "cartao-esp", onclick: () => escolher("idEspecialidade", e.id) },
-            h("span", { class: "cartao-esp__icone" }, h("img", { src: iconeEspecialidade(e.nome), alt: "", width: "45", height: "45" })),
-            h("strong", {}, e.nome),
-            e.descricao ? h("span", {}, e.descricao) : null,
-          ),
+    (lista, cx) =>
+      lista.map((e) =>
+        opcao(
+          {
+            classe: "pac-esp",
+            valor: e.id,
+            selecionado: e.id === estado.idEspecialidade,
+            rotulo: e.nome,
+            aoEscolher: () => (escolher("idEspecialidade", e.id, { avancar: false }), marcar(cx, e.id), (dica.hidden = false)),
+          },
+          h("span", { class: "pac-esp__icone" }, iconePac(iconeEspecialidade(e.nome))),
+          h("span", { class: "pac-esp__selo" }, iconePac("selecionada"), "Selecionada"),
+          h("span", { class: "pac-esp__nome" }, e.nome),
+          e.descricao ? h("span", { class: "pac-esp__desc" }, e.descricao) : null,
         ),
       ),
-    ],
     itens.length === 0 ? "Nenhuma especialidade com profissional disponível no momento." : "Nenhuma especialidade encontrada.",
+    "Especialidades",
   );
   return {
     titulo: "Qual atendimento você procura?",
     sub: "Escolha a especialidade que melhor atende às suas necessidades.",
-    corpo: [
-      campoBusca("Buscar especialidade...", (t) => ((busca.texto = t), filtrar())),
-      h("p", { class: "fluxo__secao" }, "Especialidades ortopédicas"),
-      caixa,
-    ],
+    corpo: [buscaPac("Buscar especialidade...", (t) => ((busca.texto = t), filtrar())), h("p", { class: "pac-lista-titulo" }, "Especialidades ortopédicas"), caixa, dica],
   };
-}
-
-function cartaoRadio({ classe = "", selecionado, aoEscolher, rotulo, conteudo }) {
-  return h(
-    "button",
-    { type: "button", role: "radio", class: `opcao-radio ${classe}`.trim(), "aria-checked": String(selecionado), "aria-label": rotulo, onclick: aoEscolher },
-    ...conteudo,
-  );
 }
 
 function passoLocal() {
@@ -232,39 +236,45 @@ function passoLocal() {
   const { caixa, filtrar } = listaFiltravel(
     itens,
     (c) => `${c.nome} ${c.endereco}`,
-    (lista) => [
-      h(
-        "div",
-        { class: "lista-opcoes", role: "radiogroup", "aria-label": "Unidades" },
-        lista.map((c) =>
-          cartaoRadio({
-            classe: "opcao-radio--destaque",
+    (lista, cx) =>
+      lista.map((c, i) =>
+        opcao(
+          {
+            classe: "pac-local",
+            valor: c.id,
             selecionado: c.id === estado.idClinica,
             rotulo: c.nome,
-            aoEscolher: () => (escolher("idClinica", c.id, { avancar: false }), marcar(caixa, c.id)),
-            conteudo: [
-              h("span", { class: "opcao-radio__seletor", "aria-hidden": "true" }),
-              h("span", { class: "opcao-radio__texto", "data-id": c.id }, h("strong", {}, c.nome), h("span", {}, c.ruaNumero || c.endereco), c.cidadeUf && c.ruaNumero ? h("span", {}, c.cidadeUf) : null),
-            ],
-          }),
+            aoEscolher: () => (escolher("idClinica", c.id, { avancar: false }), marcar(cx, c.id)),
+          },
+          h("span", { class: "pac-radio", "aria-hidden": "true" }),
+          h("span", { class: "pac-sigla", "data-cor": String(corDoItem(c.id)), "aria-hidden": "true" }, sigla(c.nome)),
+          h(
+            "span",
+            { class: "pac-local__texto" },
+            h("span", { class: "pac-local__nome" }, c.nome),
+            h("span", { class: "pac-local__linha" }, c.ruaNumero || c.endereco),
+            c.cidadeUf && c.ruaNumero ? h("span", { class: "pac-local__linha" }, c.cidadeUf) : null,
+          ),
         ),
       ),
-    ],
     "Nenhuma unidade encontrada.",
+    "Unidades",
   );
   return {
     titulo: "Escolha o local do atendimento",
-    sub: "Selecione a unidade mais próxima de você.",
-    corpo: [campoBusca("Buscar unidade...", (t) => ((busca.texto = t), filtrar())), caixa],
+    sub: `Selecione a unidade mais próxima de você. Especialidades: ${cat.especialidadePorId.get(estado.idEspecialidade)?.nome ?? ""}.`,
+    corpo: [buscaPac("Buscar unidade...", (t) => ((busca.texto = t), filtrar())), caixa],
   };
 }
 
-// Atualiza aria-checked sem redesenhar (mantém foco e rolagem).
-function marcar(caixa, id) {
-  caixa.querySelectorAll("[role=radio]").forEach((b) => {
-    const alvo = b.querySelector("[data-id]")?.dataset.id ?? b.dataset.valor;
-    b.setAttribute("aria-checked", String(String(alvo) === String(id)));
-  });
+// Cor estável por item (a mesma unidade ou profissional tem sempre a mesma cor).
+const corDoItem = (id) => Math.abs((Number(id) || 1) - 1) % 5;
+
+// Sigla de duas letras: iniciais das duas primeiras palavras que importam ("Hospital de Ortopedia" -> "HO").
+function sigla(nome) {
+  const palavras = String(nome ?? "").split(/\s+/).filter((p) => p && !/^(d[aeo]s?|e)$/i.test(p));
+  if (palavras.length >= 2) return (palavras[0][0] + palavras[1][0]).toUpperCase();
+  return String(nome ?? "").slice(0, 2).toUpperCase();
 }
 
 function passoProfissional() {
@@ -273,55 +283,46 @@ function passoProfissional() {
   const { caixa, filtrar } = listaFiltravel(
     itens,
     ({ prof }) => prof.nome,
-    (lista) => [
-      h(
-        "div",
-        { class: "lista-opcoes", role: "radiogroup", "aria-label": "Profissionais" },
-        lista.map(({ vinculo, prof }) =>
-          cartaoRadio({
-            classe: "opcao-radio--prof",
+    (lista, cx) =>
+      lista.map(({ vinculo, prof }) =>
+        opcao(
+          {
+            classe: "pac-prof",
+            valor: vinculo.id,
             selecionado: vinculo.id === estado.idVinculo,
             rotulo: prof.nome,
-            aoEscolher: () => (escolher("idVinculo", vinculo.id, { avancar: false }), marcar(caixa, vinculo.id)),
-            conteudo: [
-              h("span", { class: "opcao-radio__seletor", "aria-hidden": "true" }),
-              h(
-                "span",
-                { class: "opcao-radio__texto", "data-id": vinculo.id },
-                h("strong", {}, prof.nome),
-                h("span", {}, esp?.nome ?? ""),
-                h("span", {}, [prof.conselho, prof.registro].filter(Boolean).join(" ") + (prof.uf ? `/${prof.uf}` : "")),
-              ),
-              h("span", { class: "opcao-radio__avatar", "aria-hidden": "true" }, iniciais(prof.nome)),
-            ],
-          }),
+            aoEscolher: () => (escolher("idVinculo", vinculo.id, { avancar: false }), marcar(cx, vinculo.id)),
+          },
+          h("span", { class: "pac-avatar-prof", "data-cor": String(corDoItem(prof.id ?? vinculo.idProfissional)), "aria-hidden": "true" }, iniciais(prof.nome)),
+          h(
+            "span",
+            { class: "pac-prof__texto" },
+            h("span", { class: "pac-prof__nome" }, prof.nome),
+            h("span", { class: "pac-prof__esp" }, esp?.nome ?? ""),
+            h("span", { class: "pac-prof__reg" }, [[prof.conselho, prof.registro].filter(Boolean).join(" "), prof.uf].filter(Boolean).join("-")),
+          ),
+          h("span", { class: "pac-radio", "aria-hidden": "true" }),
         ),
       ),
-    ],
     "Nenhum profissional encontrado.",
+    "Profissionais",
   );
   return {
     titulo: "Escolha o profissional",
     sub: "Selecione o profissional que irá realizar seu atendimento.",
-    corpo: [campoBusca("Buscar profissional...", (t) => ((busca.texto = t), filtrar())), caixa],
+    corpo: [buscaPac("Buscar profissional...", (t) => ((busca.texto = t), filtrar())), caixa],
   };
 }
 
 // ---------- calendário ----------
-const SETA = (d) =>
-  `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="${d}"/></svg>`;
-const iconeSeta = (d) => {
-  const span = h("span");
-  span.innerHTML = SETA(d); // conteúdo fixo escrito aqui, nunca vindo da API
-  return span.firstChild;
-};
-
 function passoData() {
   const datas = datasDisponiveis(estado.idVinculo);
   const corpo = [];
+  const titulo = "Escolha a data";
+  const sub = "Selecione um dia disponível para o atendimento.";
   if (datas.length === 0) {
-    corpo.push(estadoVazio("Este profissional não tem horários livres no momento. Volte e escolha outro profissional."));
-    return { titulo: "Escolha uma data", sub: "Veja as datas disponíveis para agendar o seu atendimento.", corpo };
+    corpo.push(vazio("Este profissional não tem horários livres no momento. Volte e escolha outro profissional."));
+    return { titulo, sub, corpo };
   }
 
   const livres = new Set(datas);
@@ -333,25 +334,31 @@ function passoData() {
   }
   const indice = (a, m) => a * 12 + (m - 1);
 
-  const topo = h("div", { class: "calendario__topo" });
-  const grade = h("div", { class: "calendario__grade", role: "group" });
-  const legenda = h("p", { class: "calendario__legenda", "aria-live": "polite" });
-  const cartao = h("div", { class: "calendario" }, topo, grade);
+  const topo = h("div", { class: "pac-cal__topo" });
+  const grade = h("div", { class: "pac-cal__grade", role: "group", "aria-label": "Dias do mês" });
+  const aviso = h("p", { class: "pac-sr", "aria-live": "polite" });
+  const legenda = h(
+    "ul",
+    { class: "pac-cal__leg" },
+    h("li", {}, h("i", { class: "l-disp" }), "Disponível"),
+    h("li", {}, h("i", { class: "l-nao" }), "Não disponível"),
+    h("li", {}, h("i", { class: "l-sel" }), "Selecionado"),
+  );
+  const cartao = h("div", { class: "pac-cal" }, topo, grade, legenda);
 
   function desenhar() {
     const { ano, mes } = estado.mes;
     const atual = indice(ano, mes);
-    const mesAno = new Date(ano, mes - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" }); // "outubro de 2026"
-    const nome = mesAno.charAt(0).toUpperCase() + mesAno.slice(1);
-    const ant = h("button", { type: "button", class: "calendario__nav", "aria-label": "Mês anterior", disabled: atual <= indice(ya, ma),
-      onclick: () => ((estado.mes = mes === 1 ? { ano: ano - 1, mes: 12 } : { ano, mes: mes - 1 }), desenhar()) }, iconeSeta("m15 18-6-6 6-6"));
-    const prox = h("button", { type: "button", class: "calendario__nav", "aria-label": "Próximo mês", disabled: atual >= indice(yz, mz),
-      onclick: () => ((estado.mes = mes === 12 ? { ano: ano + 1, mes: 1 } : { ano, mes: mes + 1 }), desenhar()) }, iconeSeta("m9 18 6-6-6-6"));
-    topo.replaceChildren(ant, h("p", { class: "calendario__mes", "aria-live": "polite" }, nome), prox);
+    const nome = new Date(ano, mes - 1, 1).toLocaleDateString("pt-BR", { month: "long", year: "numeric" }); // "outubro de 2026" (o CSS põe em maiúsculas)
+    const ant = h("button", { type: "button", class: "pac-cal__nav", "aria-label": "Mês anterior", disabled: atual <= indice(ya, ma),
+      onclick: () => ((estado.mes = mes === 1 ? { ano: ano - 1, mes: 12 } : { ano, mes: mes - 1 }), desenhar()) }, iconePac("cal-ant"));
+    const prox = h("button", { type: "button", class: "pac-cal__nav", "aria-label": "Próximo mês", disabled: atual >= indice(yz, mz),
+      onclick: () => ((estado.mes = mes === 12 ? { ano: ano + 1, mes: 1 } : { ano, mes: mes + 1 }), desenhar()) }, iconePac("cal-prox"));
+    topo.replaceChildren(ant, h("p", { class: "pac-cal__mes", "aria-live": "polite" }, nome), prox);
 
     const primeiro = new Date(ano, mes - 1, 1).getDay();
     const total = new Date(ano, mes, 0).getDate();
-    const celulas = ["D", "S", "T", "Q", "Q", "S", "S"].map((d) => h("span", { class: "calendario__semana", "aria-hidden": "true" }, d));
+    const celulas = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => h("span", { class: "pac-cal__sem", "aria-hidden": "true" }, d));
     for (let i = 0; i < primeiro; i++) celulas.push(h("span"));
     for (let d = 1; d <= total; d++) {
       const iso = `${ano}-${String(mes).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
@@ -361,7 +368,7 @@ function passoData() {
           "button",
           {
             type: "button",
-            class: "calendario__dia",
+            class: "pac-cal__dia",
             disabled: !livre,
             "data-data": iso,
             "aria-pressed": livre ? String(estado.data === iso) : false,
@@ -369,7 +376,7 @@ function passoData() {
             onclick: () => {
               escolher("data", iso, { avancar: false });
               grade.querySelectorAll("[data-data]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.data === iso)));
-              legenda.textContent = `Data escolhida: ${formatarData(iso)}`;
+              aviso.textContent = `Data escolhida: ${formatarData(iso)}`;
             },
           },
           String(d),
@@ -379,27 +386,22 @@ function passoData() {
     grade.replaceChildren(...celulas);
   }
   desenhar();
-  legenda.textContent = estado.data ? `Data escolhida: ${formatarData(estado.data)}` : "Os dias destacados têm horários livres.";
 
-  return {
-    titulo: "Escolha uma data",
-    sub: "Veja as datas disponíveis para agendar o seu atendimento.",
-    corpo: [cartao, legenda],
-  };
+  return { titulo, sub, corpo: [cartao, aviso] };
 }
 
 function passoHorario() {
   const livres = horariosLivres(estado.idVinculo, estado.data);
   const corpo = [];
   if (livres.length === 0) {
-    corpo.push(estadoVazio("Não há mais horários livres neste dia. Volte e escolha outra data."));
+    corpo.push(vazio("Não há mais horários livres neste dia. Volte e escolha outra data."));
   } else {
     const grade = h(
       "div",
-      { class: "grade-horarios", role: "radiogroup", "aria-label": `Horários em ${formatarData(estado.data)}` },
+      { class: "pac-horarios", role: "radiogroup", "aria-label": `Horários em ${formatarData(estado.data)}` },
       livres.map((hh) =>
         h("button", {
-          type: "button", role: "radio", class: "horario", "data-hora": hh, "aria-checked": String(hh === estado.hora),
+          type: "button", role: "radio", class: "pac-horario", "data-hora": hh, "aria-checked": String(hh === estado.hora),
           onclick: () => {
             escolher("hora", hh, { avancar: false });
             grade.querySelectorAll("[data-hora]").forEach((b) => b.setAttribute("aria-checked", String(b.dataset.hora === hh)));
@@ -409,11 +411,7 @@ function passoHorario() {
     );
     const obs = h("textarea", { id: "obs", rows: "3", maxlength: "500", placeholder: "Ex.: preciso de acompanhante...", oninput: (e) => (estado.obs = e.target.value) });
     obs.value = estado.obs;
-    corpo.push(
-      h("p", { class: "fluxo__secao", style: "margin-top:12px" }, "Horários disponíveis"),
-      grade,
-      h("div", { class: "observacao" }, h("label", { for: "obs" }, "Observação (opcional)"), obs),
-    );
+    corpo.push(grade, h("div", { class: "pac-obs" }, h("label", { for: "obs" }, "Observação (opcional)"), obs));
   }
   return { titulo: "Escolha um horário", sub: "Selecione o melhor horário para você.", corpo };
 }
@@ -452,39 +450,30 @@ function mostrarPronto() {
   const vinc = cat.vinculoPorId.get(estado.idVinculo);
   const prof = cat.profissionalPorId.get(vinc?.idProfissional);
 
-  removerNavInferior();
   $("#barra").replaceChildren();
   $("#rodape").replaceChildren();
+  $("#pagina").classList.remove("pac-pag--rodape");
   const raiz = $("#conteudo");
-  raiz.className = "pronto";
+  raiz.className = "pac-pronto";
   raiz.replaceChildren(
-    h("img", { class: "pronto__icone", src: "icons/ui/sucesso.png", alt: "", width: "96", height: "96" }),
-    h("h1", { class: "pronto__titulo", tabindex: "-1" }, "Pronto!"),
-    h("p", { class: "pronto__texto" }, "Seu atendimento foi agendado."),
-    h("p", { class: "pronto__texto", style: "margin-top:2px" }, "Você poderá acessar as informações em “Consultar Agendamentos”."),
+    h("img", { src: "icons/ui/sucesso.png", alt: "", width: "96", height: "96" }),
+    h("h1", { class: "pac-h1", tabindex: "-1" }, "Pronto!"),
+    h("p", { class: "pac-pronto__texto" }, "Seu atendimento foi agendado."),
+    h("p", { class: "pac-pronto__texto" }, "Você poderá acessar as informações em “Consultas”."),
     h(
       "section",
-      { class: "pronto__card", "aria-label": "Resumo do agendamento" },
-      h(
-        "div",
-        { class: "pronto__card-topo" },
-        h("span", { class: "pronto__card-icone" }, h("img", { src: iconeEspecialidade(esp?.nome ?? ""), alt: "", width: "45", height: "45" })),
-        h("strong", {}, "Seu atendimento"),
-      ),
-      h(
-        "div",
-        { class: "pronto__linhas" },
-        h("p", {}, esp?.nome, prof ? h("br") : null, prof?.nome),
-        h("p", {}, clinica?.nome, h("br"), clinica?.ruaNumero, clinica?.ruaNumero ? h("br") : null, clinica?.cidadeUf),
-        h("p", {}, formatarDataLonga(estado.data)),
-        h("p", {}, `${estado.hora}h`),
-      ),
+      { class: "pac-pronto__card", "aria-label": "Resumo do agendamento" },
+      h("strong", {}, "Seu atendimento"),
+      h("p", {}, esp?.nome, prof ? h("br") : null, prof?.nome),
+      h("p", {}, clinica?.nome, h("br"), clinica?.ruaNumero, clinica?.ruaNumero ? h("br") : null, clinica?.cidadeUf),
+      h("p", {}, formatarDataLonga(estado.data)),
+      h("p", {}, `${estado.hora}h`),
     ),
     h(
       "div",
-      { class: "pronto__acoes" },
-      h("a", { class: "btn btn--bloco", href: "agendamentos.html" }, "Ver meus agendamentos"),
-      h("a", { class: "btn btn--contorno btn--bloco", href: "home.html" }, "Voltar para o início"),
+      { class: "pac-res__acoes" },
+      h("a", { class: "pac-btn", href: "agendamentos.html" }, "Ver meus agendamentos"),
+      h("a", { class: "pac-btn pac-btn--contorno", href: "home.html" }, "Voltar para o início"),
     ),
   );
   window.scrollTo(0, 0);
