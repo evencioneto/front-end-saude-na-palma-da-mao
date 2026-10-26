@@ -10,24 +10,13 @@
   <link rel="apple-touch-icon" href="icons/icon-192.png">
   <link rel="stylesheet" href="css/base.css">
   <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/paciente.css">
 </head>
-<body>
-  <main class="tela tela--home">
-    <header class="home__topo">
-      <div>
-        <h1 class="home__ola">Meu perfil</h1>
-        <p class="home__sub">Seus dados de acesso</p>
-      </div>
-      <img class="home__logo" src="icons/logo.svg" alt="TriaOrto+" width="32" height="32">
-    </header>
-
-    <dl class="perfil-dados">
-      <div><dt>Nome</dt><dd id="p-nome"></dd></div>
-      <div><dt>E-mail</dt><dd id="p-email"></dd></div>
-    </dl>
-
-    <button id="btn-sair" class="btn btn--grande btn--bloco perfil-sair" type="button">Sair</button>
-  </main>
+<body class="pac pac-flx">
+  <div class="pac-pag">
+    <div id="barra" class="pac-slot"></div>
+    <main id="conteudo" class="pac-corpo pac-perfil" tabindex="-1"></main>
+  </div>
   <script type="module" src="js/pages/perfil.js"></script>
 </body>
 </html>

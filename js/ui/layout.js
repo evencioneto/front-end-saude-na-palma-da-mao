@@ -9,13 +9,13 @@ const MENU = {
   [PERFIS.PROFISSIONAL]: [
     ["clinicas.html", "Clínicas"],
     ["disponibilidades.html", "Meus horários"],
-    ["agendamentos.html", "Minha agenda"],
+    ["prof-agenda.html", "Minha agenda"],
   ],
   [PERFIS.ADMIN]: [
     ["clinicas.html", "Clínicas"],
     ["profissionais.html", "Profissionais"],
     ["disponibilidades.html", "Horários"],
-    ["agendamentos.html", "Agendamentos"],
+    ["adm-agendamentos.html", "Agendamentos"],
   ],
 };
 

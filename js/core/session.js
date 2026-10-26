@@ -24,6 +24,19 @@ export const sessao = {
       /* armazenamento indisponível: sessão vale só até recarregar */
     }
   },
+  // Atualiza campos da sessão atual (ex.: nome e e-mail depois de editar o perfil), mantendo onde ela estava guardada.
+  atualizar(parcial) {
+    for (const storage of [sessionStorage, localStorage]) {
+      const atual = ler(storage);
+      if (!atual) continue;
+      try {
+        storage.setItem(SESSION_KEY, JSON.stringify({ ...atual, ...parcial }));
+      } catch {
+        /* armazenamento indisponível: a sessão continua como estava */
+      }
+      return;
+    }
+  },
   limpar() {
     for (const storage of [sessionStorage, localStorage]) {
       try {

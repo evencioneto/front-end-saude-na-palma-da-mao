@@ -64,3 +64,9 @@ export function gerarHorarios({ horaInicio, horaFim, duracaoMinutos }) {
   for (let t = emMin(horaInicio); t + passo <= emMin(horaFim); t += passo) saida.push(fmt(t));
   return saida;
 }
+
+// "2026-09-05" -> "05/09/2026" (sem passar por Date, para não sofrer com fuso horário).
+export function dataCurta(iso) {
+  const [y, m, d] = String(iso ?? "").split("-");
+  return y && m && d ? `${d}/${m}/${y}` : "";
+}

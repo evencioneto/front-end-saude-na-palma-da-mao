@@ -1,12 +1,11 @@
 // Barra inferior do paciente no design novo (Início, Consultas, Avisos, Perfil), como no Figma.
 // O ícone é usado como máscara: a cor vem do CSS (verde na aba atual, cinza nas demais).
-import { h, toast } from "../core/dom.js";
+import { h } from "../core/dom.js";
 
 const ITENS = [
   { chave: "inicio", href: "home.html", rotulo: "Início", icone: "icons/pac/nav-inicio.svg" },
   { chave: "consultas", href: "agendamentos.html", rotulo: "Consultas", icone: "icons/pac/nav-consultas.svg" },
-  // Ainda não existe a tela de avisos do paciente: o item avisa em vez de levar a uma página inexistente.
-  { chave: "avisos", href: null, rotulo: "Avisos", icone: "icons/pac/nav-avisos.svg" },
+  { chave: "avisos", href: "notificacoes.html", rotulo: "Avisos", icone: "icons/pac/nav-avisos.svg" },
   { chave: "perfil", href: "perfil.html", rotulo: "Perfil", icone: "icons/pac/nav-perfil.svg" },
 ];
 
@@ -26,9 +25,7 @@ export function montarNavPaciente(ativa, selos = {}) {
         h("span", { class: "pac-selo", "data-selo": i.chave, hidden: !(n > 0), "aria-hidden": "true" }, n > 0 ? texto(n) : ""),
       );
       const filhos = [marca, h("span", {}, i.rotulo)];
-      return i.href
-        ? h("a", { href: i.href, "aria-current": i.chave === ativa ? "page" : false }, filhos)
-        : h("button", { type: "button", onclick: () => toast("Os avisos estarão disponíveis em breve.") }, filhos);
+      return h("a", { href: i.href, "aria-current": i.chave === ativa ? "page" : false }, filhos);
     }),
   );
   document.body.classList.add("com-nav-pac");
