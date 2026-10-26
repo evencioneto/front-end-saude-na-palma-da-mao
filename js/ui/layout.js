@@ -7,12 +7,11 @@ import { registrarPwa } from "../pwa.js";
 const MENU = {
   // Paciente navega pela barra inferior (ui/navInferior.js), como no Figma.
   [PERFIS.PROFISSIONAL]: [
-    ["clinicas.html", "Clínicas"],
     ["disponibilidades.html", "Meus horários"],
     ["prof-agenda.html", "Minha agenda"],
   ],
   [PERFIS.ADMIN]: [
-    ["clinicas.html", "Clínicas"],
+    ["adm-clinicas.html", "Clínicas"],
     ["profissionais.html", "Profissionais"],
     ["disponibilidades.html", "Horários"],
     ["adm-agendamentos.html", "Agendamentos"],

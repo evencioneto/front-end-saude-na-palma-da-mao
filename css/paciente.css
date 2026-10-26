@@ -430,3 +430,59 @@ body.pac-flx { background: var(--p-fundo); }
 .pac-erro { margin-top: 6px; font-size: 14.5px; line-height: 20px; font-weight: 600; color: var(--p-vermelho); }
 .pac-erro[hidden] { display: none; }
 .pac-editar__form .pac-btn { margin-top: 20px; }
+
+/* ===== Lote 5: Alterar senha, Acessibilidade, Clínicas ===== */
+.pac-input::placeholder { color: rgb(31 41 55 / 0.5); opacity: 1; }
+
+/* Alterar senha */
+.pac-senha .pac-editar__form { margin-top: 0; }
+.pac-senha .pac-editar__campo label { margin-bottom: 8.6px; }
+.pac-senha .pac-editar__campo + .pac-editar__campo { margin-top: 17px; }
+.pac-senha .pac-editar__form .pac-btn { margin-top: 16px; }
+.pac-senha .pac-btn:disabled { opacity: 0.65; color: var(--p-texto-2); }
+
+/* Acessibilidade */
+.pac-acess { display: grid; gap: 16px; padding-top: 15.6px; padding-bottom: 40px; }
+.pac-acess__intro { margin: 0 0 1.4px; font-size: 16.9px; line-height: 26px; color: var(--p-texto-2); }
+.pac-acess__tamanho { padding: 19.1px 17.1px 17.1px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); }
+.pac-acess__tamanho h2 { margin: 0 0 13.1px; font-size: 16.8px; line-height: 24px; font-weight: 700; color: var(--p-texto); }
+.pac-acess__opcoes { display: grid; gap: 8px; }
+.pac-tam { height: 52px; padding: 0; border: 0; border-radius: 12px; background: #f9fafb; box-shadow: 0 0 0 1.1px var(--p-contorno); color: var(--p-texto-2); font-size: 16.8px; line-height: 24px; font-weight: 500; cursor: pointer; }
+.pac-tam[aria-checked="true"] { background: var(--p-verde-claro); box-shadow: 0 0 0 1.1px var(--p-verde); color: var(--p-verde-esc); font-weight: 700; }
+/* As escolhas valem para o aplicativo todo (atributos no <html>, ver js/ui/acessibilidade.js). */
+html[data-texto="grande"] body.pac { zoom: 1.12; }
+html[data-texto="extra"] body.pac { zoom: 1.25; }
+html[data-contraste] body.pac { --p-texto: #000; --p-texto-2: #111827; --p-texto-3: #1f2937; --p-contorno: #111827; --p-verde: #0a5e54; --p-verde-esc: #064239; --p-verde-borda: #0a5e54; --p-cinza: #9ca3af; --p-vermelho: #b91c1c; }
+html[data-sem-animacao] *, html[data-sem-animacao] *::before, html[data-sem-animacao] *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+
+/* Clínicas */
+.pac-clin .pac-busca { margin-top: 16px; }
+.pac-clin__lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16.1px; margin-top: 16px; padding-bottom: 24px; }
+.pac-clinica { position: relative; display: flex; align-items: flex-start; gap: 13.5px; padding: 19.1px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); color: inherit; }
+.pac-clinica > img { flex: none; width: 48px; height: 48px; }
+.pac-clinica__texto { flex: 1; min-width: 0; display: block; padding-right: 24px; }
+.pac-clinica__nome { display: flex; align-items: center; flex-wrap: wrap; gap: 0 9.4px; min-height: 28px; font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); overflow-wrap: anywhere; }
+.pac-clinica__linha { display: flex; align-items: center; gap: 3.3px; margin-top: 4px; font-size: 14.8px; line-height: 24px; color: var(--p-texto-2); }
+.pac-clinica__linha img { flex: none; width: 13px; height: 13px; margin-left: -2.5px; }
+.pac-clinica__linha span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pac-clinica__esp { margin-top: 7px; }
+.pac-clinica__seta { position: absolute; top: 15.1px; right: 15.1px; display: block; }
+.pac-clinica__seta img { width: 24px; height: 24px; }
+.pac-pilula--inativa { height: 29px; padding: 0 9.9px; background: #fee2e2; color: var(--p-vermelho); font-size: 15px; font-weight: 600; }
+
+/* Detalhes da clínica */
+.pac-clin-det { padding-top: 16px; padding-bottom: 40px; }
+.pac-clin-det__cartao { padding: 22.2px 21.1px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); }
+.pac-clin-det__topo { display: flex; align-items: center; gap: 13.5px; }
+.pac-clin-det__topo > img { flex: none; width: 56px; height: 56px; }
+.pac-clin-det__topo > div { min-width: 0; }
+.pac-clin-det__nome { margin: 0; font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); overflow-wrap: anywhere; }
+.pac-clin-det__dados { display: grid; gap: 10.6px; margin: 16.3px 0 0; padding: 0; list-style: none; }
+.pac-clin-det__dados li { display: flex; align-items: flex-start; gap: 6.5px; font-size: 16.7px; line-height: 26.4px; color: var(--p-texto-2); }
+.pac-clin-det__dados img { flex: none; width: 16px; height: 16px; margin-top: 5.2px; }
+.pac-clin-det__dados span, .pac-clin-det__dados a { min-width: 0; overflow-wrap: anywhere; }
+.pac-clin-det__esps { margin: 16.6px 16px 0; }
+.pac-clin-det__esps h2 { margin: 0; font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); }
+.pac-clin-det__esps ul { display: grid; justify-items: start; gap: 8px; margin: 6.2px 0 0; padding: 0; list-style: none; }
+.pac-clin-det__esps li { padding: 7.15px 12.9px; border-radius: 12px; background: var(--p-verde-claro); color: var(--p-verde-esc); font-size: 15.9px; line-height: 24px; font-weight: 600; }
+.pac-clin-det__agendar, .pac-clin-det__voltar { width: calc(100% - 32px); margin: 16px 16px 0; }

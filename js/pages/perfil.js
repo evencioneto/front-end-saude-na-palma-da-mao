@@ -2,30 +2,24 @@
 import { exigirLogin, PERFIS } from "../core/guard.js";
 import { authService } from "../services/authService.js";
 import { pacienteApi } from "../services/usuarioService.js";
-import { h, $, toast } from "../core/dom.js";
+import { h, $ } from "../core/dom.js";
 import { barraPac, iconePac } from "../ui/fluxoPaciente.js";
 import { iniciais } from "../ui/fluxo.js";
 import { montarNavPaciente } from "../ui/navPaciente.js";
 import { dataCurta } from "../core/datetime.js";
 import { registrarPwa } from "../pwa.js";
 
-// Itens do menu. Os que ainda não têm tela avisam em vez de levar a uma página inexistente.
+// Itens do menu.
 const MENU = [
   { icone: "perfil-editar", rotulo: "Editar perfil", href: "perfil-editar.html" },
-  { icone: "perfil-senha", rotulo: "Alterar senha", aviso: "A alteração de senha estará disponível em breve." },
+  { icone: "perfil-senha", rotulo: "Alterar senha", href: "perfil-senha.html" },
   { icone: "perfil-aviso", rotulo: "Notificações", href: "notificacoes.html" },
-  { icone: "perfil-acess", rotulo: "Acessibilidade", aviso: "As opções de acessibilidade estarão disponíveis em breve." },
+  { icone: "perfil-acess", rotulo: "Acessibilidade", href: "perfil-acessibilidade.html" },
 ];
 
 function item(m) {
   const filhos = [h("span", { class: "pac-plista__icone" }, iconePac(m.icone)), h("span", { class: "pac-plista__rotulo" }, m.rotulo), h("span", { class: "pac-plista__seta" }, iconePac("chevron-menu"))];
-  return h(
-    "li",
-    {},
-    m.href
-      ? h("a", { class: "pac-plista__item", href: m.href }, filhos)
-      : h("button", { class: "pac-plista__item", type: "button", onclick: () => toast(m.aviso) }, filhos),
-  );
+  return h("li", {}, h("a", { class: "pac-plista__item", href: m.href }, filhos));
 }
 
 async function iniciar(s) {

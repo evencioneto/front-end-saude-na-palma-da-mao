@@ -6,23 +6,10 @@ import { h, $, toast, comBotaoOcupado } from "../core/dom.js";
 import { barraPac } from "../ui/fluxoPaciente.js";
 import { iniciais } from "../ui/fluxo.js";
 import { aplicarMascara, formatarTelefone, apenasDigitos } from "../ui/mascaras.js";
+import { campo, mostrarErro } from "../ui/campoPaciente.js";
 import { registrarPwa } from "../pwa.js";
 
 const EMAIL_OK = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-
-function campo({ id, rotulo, tipo = "text", autocomplete, inputmode, valor = "" }) {
-  const input = h("input", { id, class: "pac-input", type: tipo, autocomplete, inputmode, value: valor, "aria-describedby": `${id}-erro` });
-  const erro = h("p", { class: "pac-erro", id: `${id}-erro`, role: "alert", hidden: true });
-  return { input, erro, el: h("div", { class: "pac-editar__campo" }, h("label", { for: id }, rotulo), input, erro) };
-}
-
-function mostrarErro(c, msg) {
-  c.erro.textContent = msg ?? "";
-  c.erro.hidden = !msg;
-  if (msg) c.input.setAttribute("aria-invalid", "true");
-  else c.input.removeAttribute("aria-invalid");
-  return !msg;
-}
 
 async function iniciar(s) {
   registrarPwa();
