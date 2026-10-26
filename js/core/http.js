@@ -1,4 +1,5 @@
 import { API_URL, REQUEST_TIMEOUT_MS, SLOW_NOTICE_MS } from "../config.js";
+import { sessao } from "./session.js";
 
 export class ApiError extends Error {
   constructor(message, status = 0, data = null) {
@@ -18,7 +19,8 @@ export async function http(path, { method = "GET", body, token } = {}) {
   // Content-Type só quando há corpo: em GET isso evita o pré-voo CORS (uma ida e volta a menos).
   const headers = {};
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  if (token) headers.Authorization = `Bearer ${token}`; // pronto para quando existir JWT
+  const auth = token ?? sessao.get()?.token;
+  if (auth) headers.Authorization = `Bearer ${auth}`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -36,6 +38,10 @@ export async function http(path, { method = "GET", body, token } = {}) {
     const data = res.status === 204 ? null : await res.json().catch(() => null);
 
     if (!res.ok) {
+      if (res.status === 401 && !path.startsWith("/auth/")) {
+        sessao.limpar();
+        location.href = "login.html";
+      }
       const msg = data?.erro ?? data?.mensagem ?? `Erro ${res.status} ao falar com o servidor.`;
       throw new ApiError(msg, res.status, data);
     }

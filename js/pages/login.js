@@ -42,12 +42,10 @@ function iniciar() {
       const dados = await comBotaoOcupado($("button[type=submit]", form), "Entrando...", () =>
         authService.login(identificador, senha, { lembrar: $("#lembrar").checked }),
       );
-      if (PERFIL_ESCOLHIDO && dados.tipo !== PERFIL_ESCOLHIDO.tipo) {
-        sessao.limpar();
-        erro.textContent = `Esta conta não é de ${PERFIL_ESCOLHIDO.nome}. Volte e escolha o perfil correto.`;
-        return;
-      }
-      location.href = paginaInicial(dados.tipo);
+      toast("Login realizado com sucesso! Entrando...", "sucesso");
+      setTimeout(() => {
+        location.href = paginaInicial(dados.tipo);
+      }, 400);
     } catch (err) {
       erro.textContent = err.message;
     }
