@@ -9,20 +9,10 @@ import { carregarCatalogo } from "../ui/catalogo.js";
 import { disponibilidadeService } from "../services/disponibilidadeService.js";
 import { agendamentoService } from "../services/agendamentoService.js";
 import { formatarData, dataCurta, gerarHorarios, hojeISO, agoraHHMM } from "../core/datetime.js";
+import { iconeEspecialidade } from "../ui/iconesEspecialidade.js";
 import { registrarPwa } from "../pwa.js";
 
 const ORDEM = ["idEspecialidade", "idClinica", "idVinculo", "data", "hora"];
-// Ícone da especialidade pelo nome (o Figma tem um por área); sem correspondência, usa o de ortopedia.
-const ICONES_ESPECIALIDADE = [
-  [/traumat/i, "esp-traumatologia"],
-  [/esport/i, "esp-esportiva"],
-  [/coluna/i, "esp-coluna"],
-  [/joelho/i, "esp-joelho"],
-  [/ombro/i, "esp-ombro"],
-  [/m[aã]o|punho/i, "esp-mao"],
-  [/fisio|reabilit|fortalec|preven/i, "esp-fisioterapia"],
-];
-const iconeEspecialidade = (nome) => ICONES_ESPECIALIDADE.find(([r]) => r.test(nome))?.[1] ?? "esp-ortopedia";
 const vazio = (texto) => h("p", { class: "pac-vazio" }, texto);
 
 let eu, cat, disponibilidades, agendamentos;

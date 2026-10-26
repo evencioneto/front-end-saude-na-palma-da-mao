@@ -30,6 +30,7 @@ async function iniciar() {
     const endereco = [c.ruaNumero, c.cidadeUf].filter(Boolean).join(", ");
 
     raiz.replaceChildren(
+      ...[
       h(
         "section",
         { class: "pac-clin-det__cartao", "aria-label": "Dados da clínica" },
@@ -53,6 +54,7 @@ async function iniciar() {
       c.ativo
         ? h("a", { class: "pac-btn pac-clin-det__agendar", href: `agendamento.html?clinica=${c.id}` }, "Agendar nesta clínica")
         : h("button", { class: "pac-btn pac-clin-det__agendar", type: "button", disabled: true }, "Indisponível para agendar"),
+      ].filter(Boolean),
     );
   } catch (err) {
     raiz.replaceChildren(avisoDeErro(err.message));

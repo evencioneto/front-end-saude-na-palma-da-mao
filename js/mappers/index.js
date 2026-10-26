@@ -9,6 +9,7 @@ export const toClinica = (c) => ({
   id: num(c.id_clinica),
   nome: c.nome,
   cnpj: c.cnpj,
+  bairro: c.bairro ?? "",
   telefone: c.telefone ?? "",
   email: c.email ?? "",
   endereco: [

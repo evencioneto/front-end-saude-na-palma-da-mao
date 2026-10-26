@@ -12,7 +12,7 @@ const MENU = {
   ],
   [PERFIS.ADMIN]: [
     ["adm-clinicas.html", "Clínicas"],
-    ["profissionais.html", "Profissionais"],
+    ["adm-profissionais.html", "Profissionais"],
     ["disponibilidades.html", "Horários"],
     ["adm-agendamentos.html", "Agendamentos"],
   ],

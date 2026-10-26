@@ -486,3 +486,68 @@ html[data-sem-animacao] *, html[data-sem-animacao] *::before, html[data-sem-anim
 .pac-clin-det__esps ul { display: grid; justify-items: start; gap: 8px; margin: 6.2px 0 0; padding: 0; list-style: none; }
 .pac-clin-det__esps li { padding: 7.15px 12.9px; border-radius: 12px; background: var(--p-verde-claro); color: var(--p-verde-esc); font-size: 15.9px; line-height: 24px; font-weight: 600; }
 .pac-clin-det__agendar, .pac-clin-det__voltar { width: calc(100% - 32px); margin: 16px 16px 0; }
+
+/* ===== Lote 6: Profissionais, Profissional, Especialidades, Especialidade ===== */
+.pac-ini { flex: none; display: grid; place-items: center; width: 48px; height: 48px; border-radius: 50%; color: #fff; font-size: 16px; line-height: 24px; font-weight: 700; }
+.pac-ini--grande { width: 60px; height: 60px; font-size: 20px; }
+.pac-ini--mini { width: 36px; height: 36px; font-size: 12.5px; }
+.pac-status { display: flex; align-items: center; gap: 8px; font-size: 15.9px; line-height: 24px; font-weight: 400; color: var(--p-verde-esc); }
+.pac-status::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: #16a34a; }
+.pac-status[data-disponivel="false"] { color: var(--p-texto-3); }
+.pac-status[data-disponivel="false"]::before { background: var(--p-contorno); }
+
+/* Lista de profissionais */
+.pac-prof-lista .pac-busca { margin-top: 16px; }
+.pac-pl__lista { display: grid; grid-template-columns: minmax(0, 1fr); gap: 17.1px; margin-top: 16px; padding-bottom: 24px; }
+.pac-pl { position: relative; display: flex; align-items: center; gap: 12px; padding: 19.1px 19.1px 20.1px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); color: inherit; }
+.pac-pl__texto { flex: 1; min-width: 0; display: block; padding-right: 24px; }
+.pac-pl__texto > span:not(.pac-status) { display: block; overflow-wrap: anywhere; }
+.pac-pl__nome { font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); }
+.pac-pl__esp { font-size: 16.7px; line-height: 27px; color: var(--p-verde-esc); }
+.pac-pl__clinica { font-size: 16.7px; line-height: 27px; color: var(--p-texto-2); }
+.pac-pl__texto .pac-status { margin-top: 4px; }
+.pac-pl__seta { position: absolute; top: 50%; right: 15.1px; display: block; transform: translateY(-50%); }
+.pac-pl__seta img { display: block; width: 24px; height: 24px; }
+
+/* Perfil do profissional */
+.pac-prof-det { padding-top: 16px; padding-bottom: 40px; }
+.pac-prof-det__cartao { padding: 21.1px 21.1px 23px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); }
+.pac-prof-det__topo { display: flex; align-items: center; gap: 16px; }
+.pac-prof-det__topo > div { min-width: 0; }
+.pac-prof-det__nome { margin: 0; font-size: 17.7px; line-height: 27.5px; font-weight: 700; color: var(--p-texto); overflow-wrap: anywhere; }
+.pac-prof-det__esp { margin: 0; font-size: 16.7px; line-height: 27.5px; color: var(--p-verde-esc); }
+.pac-prof-det__registro { margin: 0; font-size: 15.9px; line-height: 27.5px; color: var(--p-texto-2); }
+.pac-prof-det__dados { display: grid; gap: 9px; margin: 14px 0 0; padding: 0; list-style: none; }
+.pac-prof-det__dados li { display: flex; align-items: center; gap: 7px; font-size: 16.7px; line-height: 26px; color: var(--p-texto-2); }
+.pac-prof-det__dados img { flex: none; width: 16px; height: 16px; }
+.pac-prof-det__dados span, .pac-prof-det__dados a { min-width: 0; overflow-wrap: anywhere; }
+.pac-status--det { margin: 14px 0 0; font-size: 16.7px; font-weight: 600; }
+.pac-prof-det__clinica { margin-top: 17px; padding: 19px 19.1px 20px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); }
+.pac-prof-det__clinica h2 { margin: 0; font-size: 15.9px; line-height: 24px; font-weight: 700; color: var(--p-texto-2); }
+.pac-prof-det__clinica-nome { display: block; margin-top: 7px; font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); overflow-wrap: anywhere; }
+.pac-prof-det__end { display: flex; align-items: center; gap: 4px; margin: 5px 0 0; font-size: 15.7px; line-height: 24px; color: var(--p-texto-2); }
+.pac-prof-det__end img { flex: none; width: 13px; height: 13px; }
+.pac-prof-det__agendar, .pac-esp-det__agendar { width: 100%; margin: 17px 0 0; }
+
+/* Especialidades (lista): os cartões são os mesmos do passo 1 do agendamento, só que como links */
+.pac-esps .pac-busca { margin-top: 16px; }
+.pac-esps .pac-lista { gap: 14.2px; padding-bottom: 24px; }
+a.pac-esp { text-decoration: none; }
+
+/* Detalhe da especialidade */
+.pac-esp-det { padding-top: 17px; padding-bottom: 36px; }
+.pac-esp-det__cartao { padding: 21px 21px 21px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); }
+.pac-esp-det__topo { display: flex; align-items: center; gap: 16px; }
+.pac-esp-det__icone { flex: none; display: grid; place-items: center; width: 56px; height: 56px; border-radius: 14px; background: var(--p-verde-claro); }
+.pac-esp-det__icone img { width: 32px; height: 32px; }
+.pac-esp-det__nome { margin: 0; font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); overflow-wrap: anywhere; }
+.pac-esp-det__desc { margin: 12px 0 0; font-size: 16.7px; line-height: 26px; color: var(--p-texto-2); }
+.pac-esp-det__secao { margin-top: 17px; }
+.pac-esp-det__secao h2 { margin: 0 16px; font-size: 17.7px; line-height: 28px; font-weight: 700; color: var(--p-texto); }
+.pac-esp-det__itens { display: grid; grid-template-columns: minmax(0, 1fr); gap: 9.6px; margin-top: 6px; }
+.pac-mini { display: flex; align-items: center; gap: 12px; padding: 12.5px 16px 13.5px; border-radius: 16px; background: #fff; box-shadow: 0 0 0 1.1px var(--p-contorno); color: inherit; }
+.pac-mini > img { flex: none; width: 36px; height: 36px; }
+.pac-mini__texto { flex: 1; min-width: 0; display: block; }
+.pac-mini__texto > span { display: block; overflow-wrap: anywhere; }
+.pac-mini__nome { font-size: 16.7px; line-height: 26px; font-weight: 700; color: var(--p-texto); }
+.pac-mini__sub { font-size: 16px; line-height: 24px; color: var(--p-texto-2); }
