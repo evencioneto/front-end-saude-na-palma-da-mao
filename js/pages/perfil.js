@@ -1,16 +1,57 @@
-// Perfil do paciente: mostra os dados da sessão e permite sair.
+// Perfil do paciente: dados da conta, atalhos de configuração e Sair.
 import { exigirLogin, PERFIS } from "../core/guard.js";
 import { authService } from "../services/authService.js";
-import { $ } from "../core/dom.js";
-import { montarNavInferior } from "../ui/navInferior.js";
+import { pacienteApi } from "../services/usuarioService.js";
+import { h, $ } from "../core/dom.js";
+import { barraPac, iconePac } from "../ui/fluxoPaciente.js";
+import { iniciais } from "../ui/fluxo.js";
+import { montarNavPaciente } from "../ui/navPaciente.js";
+import { dataCurta } from "../core/datetime.js";
 import { registrarPwa } from "../pwa.js";
 
-function iniciar(s) {
+// Itens do menu.
+const MENU = [
+  { icone: "perfil-editar", rotulo: "Editar perfil", href: "perfil-editar.html" },
+  { icone: "perfil-senha", rotulo: "Alterar senha", href: "perfil-senha.html" },
+  { icone: "perfil-aviso", rotulo: "Notificações", href: "notificacoes.html" },
+  { icone: "perfil-acess", rotulo: "Acessibilidade", href: "perfil-acessibilidade.html" },
+];
+
+function item(m) {
+  const filhos = [h("span", { class: "pac-plista__icone" }, iconePac(m.icone)), h("span", { class: "pac-plista__rotulo" }, m.rotulo), h("span", { class: "pac-plista__seta" }, iconePac("chevron-menu"))];
+  return h("li", {}, h("a", { class: "pac-plista__item", href: m.href }, filhos));
+}
+
+async function iniciar(s) {
   registrarPwa();
-  $("#p-nome").textContent = s.nome ?? "";
-  $("#p-email").textContent = s.email ?? "";
-  $("#btn-sair").addEventListener("click", () => authService.logout());
-  montarNavInferior("perfil");
+  $("#barra").replaceChildren(barraPac("Perfil", "home.html"));
+  montarNavPaciente("perfil");
+
+  const nascimento = h("p", { class: "pac-perfil__nasc", id: "p-nascimento", hidden: true });
+  $("#conteudo").replaceChildren(
+    h(
+      "section",
+      { class: "pac-perfil__cartao", "aria-label": "Seus dados" },
+      h("span", { class: "pac-avatar-grande", "aria-hidden": "true" }, iniciais(s.nome)),
+      h("div", { class: "pac-perfil__dados" }, h("h1", { class: "pac-perfil__nome", id: "p-nome" }, s.nome ?? ""), h("p", { class: "pac-perfil__email", id: "p-email" }, s.email ?? ""), nascimento),
+    ),
+    h("ul", { class: "pac-plista" }, MENU.map(item)),
+    h("button", { class: "pac-sair", id: "btn-sair", type: "button", onclick: () => authService.logout() }, h("span", { class: "pac-sair__icone" }, iconePac("perfil-sair")), h("span", { class: "pac-sair__rotulo" }, "Sair")),
+  );
+
+  // A data de nascimento é um complemento: se a API falhar, o cartão aparece sem ela.
+  try {
+    if (s.idPaciente) {
+      const p = await pacienteApi.buscar(s.idPaciente);
+      const texto = dataCurta(String(p?.data_nascimento ?? "").slice(0, 10));
+      if (texto) {
+        nascimento.textContent = `Nascimento: ${texto}`;
+        nascimento.hidden = false;
+      }
+    }
+  } catch {
+    /* sem a data */
+  }
 }
 
 const sessao = exigirLogin([PERFIS.PACIENTE]);

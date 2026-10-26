@@ -19,6 +19,7 @@ function iniciar() {
   if (PERFIL_ESCOLHIDO && PERFIL_ESCOLHIDO.tipo !== PERFIS.PACIENTE) $("#cadastro").hidden = true;
   const erro = $("#erro");
   const aviso = $("#aviso-lento");
+  if (new URLSearchParams(location.search).has("expirou")) erro.textContent = "Sua sessão expirou. Entre novamente.";
 
   window.addEventListener("api:lenta", () => (aviso.hidden = false));
   window.addEventListener("api:ociosa", () => (aviso.hidden = true));
@@ -42,6 +43,11 @@ function iniciar() {
       const dados = await comBotaoOcupado($("button[type=submit]", form), "Entrando...", () =>
         authService.login(identificador, senha, { lembrar: $("#lembrar").checked }),
       );
+      if (PERFIL_ESCOLHIDO && dados.tipo !== PERFIL_ESCOLHIDO.tipo) {
+        sessao.limpar();
+        erro.textContent = `Esta conta não é de ${PERFIL_ESCOLHIDO.nome}. Volte e escolha o perfil correto.`;
+        return;
+      }
       toast("Login realizado com sucesso! Entrando...", "sucesso");
       setTimeout(() => {
         location.href = paginaInicial(dados.tipo);

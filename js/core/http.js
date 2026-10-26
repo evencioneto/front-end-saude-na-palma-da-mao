@@ -14,13 +14,15 @@ let pendentes = 0;
 const emitir = (nome) => window.dispatchEvent(new CustomEvent(nome));
 
 // Cliente HTTP único. Services nunca chamam fetch diretamente.
-// A API responde erros como { erro } (400/500) ou { mensagem } (404).
-export async function http(path, { method = "GET", body, token } = {}) {
+// A API responde erros como { erro } (400/500) ou { mensagem } (401/403/404/409).
+// O token da sessão (JWT) vai em todas as chamadas. `token` força outro (usado logo após o login, antes de a sessão existir)
+// e `autenticar: false` não envia nenhum (login e cadastro).
+export async function http(path, { method = "GET", body, token, autenticar = true } = {}) {
+  const jwt = token ?? (autenticar ? sessao.token() : null);
   // Content-Type só quando há corpo: em GET isso evita o pré-voo CORS (uma ida e volta a menos).
   const headers = {};
   if (body !== undefined) headers["Content-Type"] = "application/json";
-  const auth = token ?? sessao.get()?.token;
-  if (auth) headers.Authorization = `Bearer ${auth}`;
+  if (jwt) headers.Authorization = `Bearer ${jwt}`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
@@ -38,9 +40,10 @@ export async function http(path, { method = "GET", body, token } = {}) {
     const data = res.status === 204 ? null : await res.json().catch(() => null);
 
     if (!res.ok) {
-      if (res.status === 401 && !path.startsWith("/auth/")) {
+      // Token inválido ou vencido: a sessão não vale mais, volta para o login.
+      if (res.status === 401 && jwt && autenticar && !token) {
         sessao.limpar();
-        location.href = "login.html";
+        location.replace("login.html?expirou=1");
       }
       const msg = data?.erro ?? data?.mensagem ?? `Erro ${res.status} ao falar com o servidor.`;
       throw new ApiError(msg, res.status, data);

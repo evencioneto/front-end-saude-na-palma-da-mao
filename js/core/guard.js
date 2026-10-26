@@ -11,10 +11,12 @@ export const paginaInicial = (tipo) => "agendamento.html";
 
 // Protege uma página. Retorna a sessão, ou null se redirecionou.
 // Atenção: isto é conveniência de interface, não segurança. Quem protege
-// os dados de verdade é o back-end (que hoje ainda não tem autenticação).
+// os dados de verdade é o back-end, que confere o token (JWT) de cada chamada.
 export function exigirLogin(perfisPermitidos) {
   const s = sessao.get();
-  if (!s) {
+  // Sessão sem token (de uma versão anterior do app) não serve mais: precisa entrar de novo.
+  if (s && !s.token) sessao.limpar();
+  if (!s || !s.token) {
     location.replace("index.html");
     return null;
   }
