@@ -394,3 +394,24 @@ dialog.adm-folha::backdrop { background: rgb(0 0 0 / 0.4); }
 }
 .adm-sair__icone { flex: none; display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; background: var(--a-vermelho-claro); }
 .adm-sair__rotulo { flex: 1; text-align: center; }
+
+/* ===================================================================
+   Responsivo (tablet e computador). Mobile-first: abaixo de 768 px nada muda (layout do Figma, 390 px).
+   =================================================================== */
+@media (min-width: 768px) {
+  body.adm { --adm-larg: 720px; }
+  .adm-tela, .adm-nav { max-width: var(--adm-larg); }
+  .adm-home, .adm-lista { padding-inline: 32px; }
+  .adm-corpo { padding-inline: 32px; }
+
+  .adm-cartoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); align-items: start; }
+  .adm-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .adm-metricas { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+  .adm-form { max-width: 600px; margin-inline: auto; padding-inline: 32px; }
+
+  /* Folha de confirmação vira janela no centro da tela. */
+  dialog.adm-folha { inset: 0; max-width: 480px; height: fit-content; margin: auto; border-radius: 24px; }
+}
+@media (min-width: 1100px) {
+  body.adm { --adm-larg: 960px; }
+}
