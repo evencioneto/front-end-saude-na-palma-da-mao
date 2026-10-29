@@ -179,3 +179,18 @@
 .pub-cad__btn:disabled { background: var(--cad-btn-off); color: var(--cad-btn-off-texto); cursor: not-allowed; }
 .pub-cad__btn:focus-visible { outline: 3px solid var(--cor-realce); outline-offset: 2px; }
 @media (prefers-color-scheme: dark) { :root:not([data-tema="claro"]) .pub-cad__btn:not(:disabled) { color: #06231e; } }
+
+/* ===================================================================
+   Responsivo (tablet e computador). Mobile-first: abaixo de 768 px nada muda (layout do Figma, 390 px).
+   Telas públicas (início, perfil, login, cadastro) viram uma coluna central mais larga, sem esticar os campos.
+   =================================================================== */
+@media (min-width: 768px) {
+  .pub { max-width: 520px; padding-inline: 40px; }
+  .pub-inicio__ilustracao { margin-inline: -40px; }
+  .pub-inicio__lema { max-width: 320px; }
+  .pub-opcao__desc { max-width: none; }
+  .pub-cad__corpo { padding: 32px 40px; }
+}
+@media (min-width: 1100px) {
+  .pub { max-width: 560px; }
+}

@@ -69,6 +69,21 @@ Fonte: `Plus Jakarta Sans` / `DM Sans` se estiverem instaladas, senão a fonte d
 coloque os arquivos em `css/fonts/`, declare `@font-face` em `base.css` e inclua-os em `sw.js`.
 `icons/logo.svg`, `wordmark*.svg`, `ilustracao.svg`, `decoracao-topo.svg` e os ícones do PWA vêm do SVG exportado do Figma (quadro "inicio"). As demais telas ainda são inferidas.
 
+## Responsividade
+
+O layout é **mobile-first**: abaixo de 768 px as telas seguem exatamente o Figma (frames de 390 px). Os ajustes para tablet e
+computador ficam no **fim de cada CSS de módulo**, dentro de `@media (min-width: 768px)` e `(min-width: 1100px)`:
+
+| Largura | O que muda |
+|---|---|
+| até 767 px (celular) | nada: layout do Figma |
+| 768 px ou mais (tablet) | conteúdo e barra inferior passam a 720 px; listas de cartões em 2 colunas; folhas de confirmação viram janelas centralizadas |
+| 1100 px ou mais (computador) | conteúdo e barra inferior passam a 960 px; listas em até 3 colunas |
+
+A largura de cada módulo é uma variável (`--pac-larg`, `--prof-larg`, `--adm-larg`). Formulários e telas de leitura
+(editar perfil, senha, detalhes, perfil) ficam numa coluna de 560 a 600 px, centralizada. Ao criar uma tela nova, use as classes de
+lista existentes (ou acrescente a sua à regra de grade do módulo) e teste em 360, 390, 768 e 1280 px.
+
 ## Perfis e telas do app
 
 | Perfil | Telas |
