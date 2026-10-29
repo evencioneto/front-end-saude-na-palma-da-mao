@@ -35,7 +35,7 @@ async function completarDados(dados, token) {
 }
 
 export const authService = {
-  // "identificador" pode ser e-mail ou CPF.
+  // "identificador" pode ser e-mail ou CPF (com ou sem pontuação). CPF só existe para pacientes.
   async login(identificador, senha, { lembrar = true } = {}) {
     const entrada = String(identificador ?? "").trim();
     let email = entrada;

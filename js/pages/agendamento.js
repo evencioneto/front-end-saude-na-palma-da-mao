@@ -503,5 +503,5 @@ function mostrarPronto() {
 }
 
 // Inicia só depois de todas as declarações do módulo (evita acessar let/const antes da inicialização).
-const sessao = exigirLogin([PERFIS.PACIENTE, PERFIS.ADMIN]);
+const sessao = exigirLogin([PERFIS.PACIENTE]);
 if (sessao) iniciar(sessao);
